@@ -434,6 +434,66 @@ def delete_license(key):
    conn.commit()
    conn.close()
    return redirect('/')
-
+# ================= 🔌 CLIENT API (For Software/Website) =================
+@app.route('/api/verify', methods=['POST'])
+def verify_license():
+    # Client theke JSON ba Form data nibe
+    data = request.json if request.is_json else request.form
+    key = data.get('key')
+    current_domain = data.get('domain') 
+    
+    if not key or not current_domain:
+        return jsonify({"status": "error", "message": "Key and domain required"}), 400
+        
+    conn = get_db()
+    lic = conn.execute("SELECT * FROM licenses WHERE key=?", (key,)).fetchone()
+    
+    # 1. Key na thakle
+    if not lic:
+        conn.close()
+        return jsonify({"status": "error", "message": "Invalid License Key"}), 404
+        
+    # 2. Account Ban thakle
+    if lic['status'] == 'Blocked':
+        conn.close()
+        return jsonify({"status": "error", "message": "Account Banned by Admin!"}), 403
+        
+    # 3. Expiry Check
+    from datetime import datetime
+    exp_date = datetime.strptime(str(lic['expiry_date']).split('.')[0], "%Y-%m-%d %H:%M:%S")
+    if datetime.now() > exp_date:
+        conn.close()
+        return jsonify({"status": "error", "message": "License Expired"}), 403
+        
+    # 4. Domain / PC Lock Checking
+    saved_domain = lic['domain']
+    if not saved_domain:
+        # First time use hocche, tai ei PC/Domain ke lock kore dibo
+        conn.execute("UPDATE licenses SET domain=? WHERE key=?", (current_domain, key))
+        conn.commit()
+        conn.close()
+        return jsonify({
+            "status": "success", 
+            "message": "License Activated & Locked to this Machine",
+            "shop_name": lic['shop_name'],
+            "expiry": str(exp_date)
+        })
+        
+    if saved_domain != current_domain:
+        # Onno PC theke try korche (Fraud Attempt!)
+        conn.execute("INSERT INTO fraud_logs (key, attempted_domain, actual_domain) VALUES (?, ?, ?)", 
+                     (key, current_domain, saved_domain))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "error", "message": "Fraud Attempt! This key is registered to another machine."}), 403
+        
+    # Sob thik thakle
+    conn.close()
+    return jsonify({
+        "status": "success", 
+        "message": "License Valid", 
+        "shop_name": lic['shop_name'],
+        "expiry": str(exp_date)
+    })
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
