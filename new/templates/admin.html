@@ -1,0 +1,3451 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study AI — অ্যাডমিন প্যানেল</title>
+<style>
+/* ══════════════════════════════════════════════════════════
+   CSS RESET & CUSTOM PROPERTIES
+   ══════════════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #f1f3f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fafafa;
+  --border-glass: #e5e7eb;
+  --border-hover: #6366f1;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --accent-1: #6366f1;
+  --accent-2: #8b5cf6;
+  --accent-3: #4f46e5;
+  --gradient-accent: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  --gradient-card: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(139,92,246,0.02) 100%);
+  --gradient-progress: linear-gradient(90deg, #6366f1, #8b5cf6, #a78bfa);
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #d97706;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
+  --shadow-md: 0 2px 10px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-glow: 0 0 0 3px rgba(99,102,241,0.12);
+  --font-bn: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-en: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════════════════════
+   SCROLLBAR
+   ══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f3f5; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+html { scrollbar-color: #d1d5db #f1f3f5; scrollbar-width: thin; }
+
+/* ══════════════════════════════════════════════════════════
+   BASE
+   ══════════════════════════════════════════════════════════ */
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-bn);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Ambient background — light theme এ দরকার নাই */
+body::before, body::after { display: none; }
+
+/* ══════════════════════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════════════════════ */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-glass);
+  padding: 0 24px;
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-logo {
+  width: 36px;
+  height: 36px;
+  background: var(--gradient-accent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 0 20px rgba(99,102,241,0.3);
+}
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: var(--font-en);
+}
+.header-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(99,102,241,0.1);
+  color: var(--accent-1);
+  border: 1px solid rgba(99,102,241,0.2);
+  font-family: var(--font-en);
+  letter-spacing: 0.5px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB BAR
+   ══════════════════════════════════════════════════════════ */
+.tab-bar {
+  position: sticky;
+  top: 64px;
+  z-index: 99;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-glass);
+  padding: 0 24px;
+}
+.tab-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  position: relative;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-bar-inner::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex-shrink: 0;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-bn);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab-btn:hover { color: var(--text-secondary); }
+.tab-btn.active { color: var(--accent-1); }
+.tab-btn .tab-icon { font-size: 16px; }
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--gradient-accent);
+  border-radius: 2px 2px 0 0;
+  transition: left var(--transition-smooth), width var(--transition-smooth);
+  box-shadow: 0 0 10px rgba(99,102,241,0.5);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MAIN CONTAINER
+   ══════════════════════════════════════════════════════════ */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+.tab-panel { display: none; animation: fadeSlideIn 0.4s ease; }
+.tab-panel.active { display: block; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CARDS (Glassmorphism)
+   ══════════════════════════════════════════════════════════ */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-glow);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.card-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FORM ELEMENTS
+   ══════════════════════════════════════════════════════════ */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-bn);
+  font-size: 14px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: #9ca3af; }
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+.form-select option { background: #ffffff; color: var(--text-primary); }
+.form-textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+.input-group .form-input { flex: 1; }
+
+/* ══════════════════════════════════════════════════════════
+   BUTTONS
+   ══════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-bn);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+.btn:hover::after { opacity: 1; }
+.btn:active { transform: scale(0.97); }
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn:disabled::after { display: none; }
+
+.btn-primary {
+  background: var(--gradient-accent);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(99,102,241,0.3);
+}
+.btn-primary:hover { box-shadow: 0 6px 20px rgba(99,102,241,0.45); transform: translateY(-1px); }
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: var(--accent-1);
+  border: 1px solid #d1d5db;
+}
+.btn-secondary:hover {
+  background: #e5e7eb;
+  border-color: var(--accent-1);
+}
+
+.btn-danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+.btn-danger:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.btn-success {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #86efac;
+}
+.btn-success:hover {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
+.btn-sm { padding: 7px 14px; font-size: 13px; border-radius: var(--radius-sm); }
+.btn-icon { width: 36px; height: 36px; padding: 0; border-radius: var(--radius-sm); }
+
+/* ══════════════════════════════════════════════════════════
+   STATUS INDICATORS
+   ══════════════════════════════════════════════════════════ */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.status-pill.success { background: rgba(22,163,74,0.08); color: #16a34a; border: 1px solid rgba(22,163,74,0.2); }
+.status-pill.error { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.2); }
+.status-pill.warning { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.2); }
+.status-pill .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-dot 2s ease infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   FILE UPLOAD AREA
+   ══════════════════════════════════════════════════════════ */
+.upload-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: var(--radius-lg);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  background: #f9fafb;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--accent-1);
+  background: #eef2ff;
+}
+.upload-zone.drag-over { transform: scale(1.01); }
+.upload-zone.has-file {
+  border-color: var(--success);
+  background: #f0fdf4;
+}
+.upload-zone-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+  transition: transform var(--transition-smooth);
+}
+.upload-zone:hover .upload-zone-icon { transform: translateY(-4px); }
+.upload-zone-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.upload-zone-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #f0fdf4;
+  border-radius: var(--radius-md);
+  border: 1px solid #86efac;
+}
+.file-info-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-info-size { font-size: 12px; color: var(--text-muted); font-family: var(--font-en); }
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESS BAR
+   ══════════════════════════════════════════════════════════ */
+.progress-container { margin: 20px 0; }
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.progress-label { font-size: 13px; color: var(--text-secondary); }
+.progress-value { font-size: 13px; font-weight: 600; color: var(--accent-3); font-family: var(--font-en); }
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-progress);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+  min-width: 0;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+  animation: progress-shimmer 1.5s ease infinite;
+}
+@keyframes progress-shimmer {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   STEP INDICATOR
+   ══════════════════════════════════════════════════════════ */
+.step-flow { display: flex; flex-direction: column; gap: 0; }
+.step-item {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 24px;
+  position: relative;
+}
+.step-item:last-child { padding-bottom: 0; }
+.step-item::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 38px;
+  bottom: 0;
+  width: 2px;
+  background: #e5e7eb;
+}
+.step-item:last-child::before { display: none; }
+.step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eef2ff;
+  border: 2px solid #c7d2fe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-1);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-en);
+}
+.step-item.completed .step-number {
+  background: var(--accent-1);
+  border-color: var(--accent-1);
+  color: #fff;
+}
+.step-content { flex: 1; padding-top: 4px; }
+.step-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   DATA TABLE / FILE LIST
+   ══════════════════════════════════════════════════════════ */
+.data-list { display: flex; flex-direction: column; gap: 8px; }
+.data-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #f8f9fa;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+.data-item:hover {
+  border-color: var(--border-hover);
+  background: #f3f4f6;
+}
+.data-item-icon { font-size: 24px; flex-shrink: 0; }
+.data-item-info { flex: 1; min-width: 0; }
+.data-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.data-item-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  font-family: var(--font-en);
+}
+.data-item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.data-item-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-1);
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════════════════
+   JOB LIST
+   ══════════════════════════════════════════════════════════ */
+.job-item {
+  padding: 16px 18px;
+  background: #f8f9fa;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  transition: all var(--transition-fast);
+}
+.job-item:hover { border-color: var(--border-hover); }
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.job-id { font-size: 13px; color: var(--text-muted); font-family: var(--font-en); }
+.job-status { font-size: 12px; }
+.job-details { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+.job-error {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #dc2626;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CQ PARTS (Dynamic form)
+   ══════════════════════════════════════════════════════════ */
+.cq-part {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px;
+  background: #f8f9fa;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  animation: fadeSlideIn 0.3s ease;
+}
+.cq-part-label {
+  width: 60px;
+  flex-shrink: 0;
+}
+.cq-part-text { flex: 1; }
+.cq-part-marks { width: 80px; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+   ══════════════════════════════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: auto;
+  animation: toastIn 0.4s ease;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+}
+.toast.hiding { animation: toastOut 0.3s ease forwards; }
+.toast-success {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+.toast-error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+.toast-info {
+  background: #eef2ff;
+  border-color: #a5b4fc;
+  color: var(--accent-1);
+}
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast-close {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  margin-left: auto;
+}
+.toast-close:hover { opacity: 1; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(60px); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   EMPTY STATE
+   ══════════════════════════════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; display: block; }
+.empty-state-text { font-size: 15px; }
+
+/* ══════════════════════════════════════════════════════════
+   LOADING SPINNER
+   ══════════════════════════════════════════════════════════ */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+.spinner-sm { width: 14px; height: 14px; border-width: 1.5px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════════════════
+   DIVIDER
+   ══════════════════════════════════════════════════════════ */
+.divider {
+  border: none;
+  height: 1px;
+  background: var(--border-glass);
+  margin: 20px 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SECTION HEADER
+   ══════════════════════════════════════════════════════════ */
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .admin-header { padding: 0 16px; }
+  .tab-bar { padding: 0 8px; }
+  .tab-btn { padding: 12px 14px; font-size: 13px; }
+  .main-container { padding: 20px 16px 60px; }
+  .glass-card { padding: 20px; }
+  .form-row { grid-template-columns: 1fr; }
+  .header-badge { display: none; }
+  .data-item { flex-wrap: wrap; }
+  .data-item-actions { width: 100%; justify-content: flex-end; margin-top: 8px; }
+  .toast-container { right: 12px; left: 12px; }
+  .toast { max-width: 100%; }
+  .cq-part { flex-wrap: wrap; }
+  .cq-part-label, .cq-part-marks { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .tab-btn .tab-text { display: none; }
+  .tab-btn .tab-icon { font-size: 20px; }
+  .tab-btn { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════════════════════════ -->
+<header class="admin-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">🛠️</div>
+      <span class="header-title">Study AI</span>
+    </div>
+    <span class="header-badge">ADMIN PANEL</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════
+     TAB BAR
+     ══════════════════════════════════════════════════════════ -->
+<nav class="tab-bar">
+  <div class="tab-bar-inner" id="tabBar">
+    <button class="tab-btn active" data-tab="tab-api-key">
+      <span class="tab-icon">🔑</span>
+      <span class="tab-text">API Key</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-pdf">
+      <span class="tab-icon">📤</span>
+      <span class="tab-text">PDF আপলোড ও এক্সট্রাক্ট</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-data">
+      <span class="tab-icon">📁</span>
+      <span class="tab-text">ডেটা ম্যানেজমেন্ট</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-cq">
+      <span class="tab-icon">📝</span>
+      <span class="tab-text">CQ ম্যানেজমেন্ট</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-filemanager">
+      <span class="tab-icon">🗂️</span>
+      <span class="tab-text">ফাইল ম্যানেজার</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-dbhealth">
+      <span class="tab-icon">🗃️</span>
+      <span class="tab-text">DB স্বাস্থ্য</span>
+    </button>
+    <div class="tab-indicator" id="tabIndicator"></div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     TOAST CONTAINER
+     ══════════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN CONTENT
+     ══════════════════════════════════════════════════════════ -->
+<main class="main-container">
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 1: API KEY STATUS
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-api-key">
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">🔑</div>
+        <div>
+          <div class="card-title">Gemini API Key স্ট্যাটাস</div>
+          <div class="card-subtitle">.env ফাইল থেকে স্বয়ংক্রিয়ভাবে লোড হয়</div>
+        </div>
+      </div>
+
+      <div id="apiKeyStatus" style="margin-bottom: 20px;"></div>
+
+      <div style="background:#f8f9fa; border:1px solid #e5e7eb; border-radius:10px; padding:16px 20px; font-size:13px; color:#374151; line-height:1.8;">
+        <strong style="color:#111827;">⚙️ কিভাবে API key যোগ করবো?</strong><br>
+        <code style="background:#e5e7eb; padding:2px 6px; border-radius:4px; font-size:12px;">.env</code> ফাইলে লেখো:<br>
+        <code style="display:block; background:#e5e7eb; padding:8px 12px; border-radius:6px; margin-top:8px; font-size:12px; color:#111827;">
+          GEMINI_API_KEY_1=AIza...<br>
+          GEMINI_API_KEY_2=AIza...<br>
+          GEMINI_API_KEY_3=AIza...<br>
+          GEMINI_API_KEY_4=AIza...
+        </code>
+        তারপর server restart করলেই auto-load হবে।
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 2: PDF UPLOAD & EXTRACT
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-pdf">
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📤</div>
+        <div>
+          <div class="card-title">PDF আপলোড ও কনটেন্ট এক্সট্রাকশন</div>
+          <div class="card-subtitle">বোর্ড বই ও গাইডের PDF থেকে স্বয়ংক্রিয়ভাবে কনটেন্ট বের করুন</div>
+        </div>
+      </div>
+
+      <div class="step-flow">
+        <!-- Step 1: Select Class & Subject -->
+        <div class="step-item" id="stepSelect">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">শ্রেণি ও বিষয় নির্বাচন করুন</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">শ্রেণি</label>
+                <select class="form-select" id="pdfClassSelect" onchange="onPdfClassChange()">
+                  <option value="">— শ্রেণি বাছুন —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">গ্রুপ</label>
+                <select class="form-select" id="pdfGroupSelect" onchange="onPdfGroupChange()" disabled>
+                  <option value="">— গ্রুপ বাছুন —</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">বিষয়</label>
+                <select class="form-select" id="pdfSubjectSelect" disabled>
+                  <option value="">— বিষয় বাছুন —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Upload File -->
+        <div class="step-item" id="stepUpload">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">PDF ফাইল আপলোড করুন</div>
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" accept=".pdf" id="pdfFileInput" onchange="onFileSelected(this)">
+              <span class="upload-zone-icon">📄</span>
+              <div class="upload-zone-text">PDF ফাইল এখানে ড্র্যাগ করুন বা ক্লিক করুন</div>
+              <div class="upload-zone-hint">সর্বোচ্চ 1.5GB • শুধু .pdf ফাইল</div>
+            </div>
+            <div id="fileInfoDisplay" style="display:none;"></div>
+            <div style="margin-top: 14px;">
+              <button class="btn btn-primary" onclick="uploadPdf()" id="uploadBtn" disabled>
+                📤 আপলোড করুন
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Split PDF -->
+        <div class="step-item" id="stepSplit">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">PDF ৪ ভাগে ভাগ করুন (ঐচ্ছিক)</div>
+            <p style="font-size:13px; color:#6b7280; margin-bottom:14px;">PDF টি স্বয়ংক্রিয়ভাবে সমান ৪টি ভাগে বিভক্ত হবে — প্রতিটি ভাগ আলাদা Gemini key দিয়ে parallel process হবে।</p>
+            <input type="hidden" id="splitPartsInput" value="4">
+            <button class="btn btn-secondary" onclick="splitPdf()" id="splitBtn" disabled>
+              ✂️ ৪ ভাগে ভাগ করুন
+            </button>
+            <div id="splitResult" style="margin-top: 12px;"></div>
+          </div>
+        </div>
+
+        <!-- Step 4: Extract -->
+        <div class="step-item" id="stepExtract">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">কনটেন্ট এক্সট্রাকশন শুরু করুন</div>
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">🤖 মডেল নির্বাচন</label>
+              <select class="form-select" id="modelSelect">
+                <option value="">— মডেল বাছুন —</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label" style="font-weight:700">
+                📄 PDF এর ধরন
+                <span style="color:#f59e0b;font-size:11px;margin-left:6px">(সঠিকটা বাছো — এটাই prompt নির্ধারণ করে!)</span>
+              </label>
+              <select class="form-select" id="promptTypeSelect" style="border:2px solid #f59e0b">
+                <option value="board_book">📚 পাঠ্যবই (Board Book) — NCTB বই, সব concept/formula/example</option>
+                <option value="test_paper">📝 প্রশ্নপত্র (Test Paper) — MCQ/CQ প্রশ্ন, উত্তর সহ থাকলে</option>
+                <option value="guide">📖 গাইড বই (Guide Book) — প্রশ্ন + বিস্তারিত মডেল উত্তর</option>
+              </select>
+              <p style="font-size:11px;color:#94a3b8;margin-top:5px">
+                📚 পাঠ্যবই থেকে theory/concept বের হয় &nbsp;|&nbsp;
+                📝 প্রশ্নপত্র থেকে শুধু Q&A বের হয় &nbsp;|&nbsp;
+                📖 গাইড থেকে Q + full model answer বের হয়
+              </p>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary" onclick="startExtraction()" id="extractBtn" disabled>
+                🚀 এক্সট্রাকশন শুরু করুন
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: DB Import (দেখায় শুধু extraction শেষে) -->
+        <div class="step-item" id="stepPostExtract" style="display:none;">
+          <div class="step-number" style="background:var(--accent-1);">5</div>
+          <div class="step-content">
+            <div class="step-title">DB-তে Import করুন (FTS5 + MCQ Bank + CQ Model)</div>
+            <p style="font-size:13px;color:#6b7280;margin-bottom:12px;">
+              এক্সট্রাকশন সম্পন্ন! JSON ফাইল এখন DB-তে ঢোকাও — তারপর Chapter Sync করো।
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="runPostExtractImport()" id="postImportBtn">
+                🗂️ DB Import করুন
+              </button>
+              <button class="btn btn-secondary" onclick="runPostExtractSync()" id="postSyncBtn" disabled>
+                🔄 Chapter Sync
+              </button>
+            </div>
+            <div id="postExtractResult" style="margin-top:14px;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="glass-card" id="progressCard" style="display:none;">
+      <div class="card-header">
+        <div class="card-icon">⏳</div>
+        <div>
+          <div class="card-title">এক্সট্রাকশন প্রগ্রেস</div>
+          <div class="card-subtitle" id="progressSubtitle">প্রসেসিং চলছে...</div>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-header">
+          <span class="progress-label" id="progressLabel">পেজ: 0/0</span>
+          <span class="progress-value" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Live per-API-key progress (parallel mode) -->
+      <div id="parallelProgressRows" style="margin-top:14px;"></div>
+
+      <div id="progressErrors" style="display:none;"></div>
+    </div>
+
+    <!-- Jobs List -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div>
+          <div class="card-title">সকল জব</div>
+          <div class="card-subtitle">এক্সট্রাকশন জবের তালিকা</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadJobs()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="jobsList">
+        <div class="empty-state">
+          <span class="empty-state-icon">📋</span>
+          <div class="empty-state-text">কোনো জব নেই</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 3: DATA MANAGEMENT
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-data">
+    <!-- Data Files -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📁</div>
+        <div>
+          <div class="card-title">ডেটা ফাইলসমূহ</div>
+          <div class="card-subtitle">এক্সট্রাক্টেড JSON ডেটা ফাইল পরিচালনা করুন</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadDataFiles()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+
+      <div id="dataFilesList">
+        <div class="empty-state">
+          <span class="empty-state-icon">📂</span>
+          <div class="empty-state-text">কোনো ডেটা ফাইল নেই</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Merge Section -->
+      <div class="section-title">🔗 ফাইল মার্জ</div>
+      <div id="mergeSection">
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+          একাধিক ফাইল নির্বাচন করে মার্জ করুন (উপরে চেকবক্স ব্যবহার করুন)
+        </p>
+        <button class="btn btn-secondary" onclick="mergeFiles()" id="mergeBtn" disabled>
+          🔗 নির্বাচিত ফাইল মার্জ করুন
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload JSON -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📥</div>
+        <div>
+          <div class="card-title">JSON ফাইল আপলোড</div>
+          <div class="card-subtitle">বাহ্যিক JSON ডেটা ফাইল আপলোড করুন</div>
+        </div>
+      </div>
+
+      <div class="upload-zone" id="jsonUploadZone">
+        <input type="file" accept=".json" id="jsonFileInput" onchange="onJsonFileSelected(this)">
+        <span class="upload-zone-icon">📋</span>
+        <div class="upload-zone-text">JSON ফাইল এখানে ড্র্যাগ করুন বা ক্লিক করুন</div>
+        <div class="upload-zone-hint">শুধু .json ফাইল</div>
+      </div>
+      <div id="jsonFileInfoDisplay" style="display:none;"></div>
+      <div style="margin-top: 14px;">
+        <button class="btn btn-primary" onclick="uploadJson()" id="uploadJsonBtn" disabled>
+          📥 JSON আপলোড করুন
+        </button>
+      </div>
+    </div>
+
+    <!-- Split Files -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">✂️</div>
+        <div>
+          <div class="card-title">স্প্লিট ফাইলসমূহ</div>
+          <div class="card-subtitle">PDF থেকে ভাগ করা ফাইলের তালিকা</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadSplitFiles()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="splitFilesList">
+        <div class="empty-state">
+          <span class="empty-state-icon">✂️</span>
+          <div class="empty-state-text">কোনো স্প্লিট ফাইল নেই</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── নতুন: JSON Upload + DB Import একসাথে ── -->
+    <div class="glass-card" style="border:2px solid #6c63ff33;">
+      <div class="card-header">
+        <div class="card-icon">📤</div>
+        <div>
+          <div class="card-title">JSON আপলোড করুন → সরাসরি DB তে</div>
+          <div class="card-subtitle">বন্ধু JSON দিলে এখানে আপলোড করুন — সঠিক folder এ save হবে + DB import হবে।</div>
+        </div>
+      </div>
+
+      <!-- Class + Subject + Source Type -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <select id="uaiClass" onchange="loadUaiSubjects()" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— ক্লাস —</option>
+        </select>
+        <select id="uaiSubject" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— বিষয় —</option>
+        </select>
+        <select id="uaiSourceType" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="guide">📖 গাইড বই</option>
+          <option value="board_book">📚 পাঠ্যবই</option>
+          <option value="test_paper">📝 প্রশ্নপত্র</option>
+        </select>
+      </div>
+
+      <!-- File Upload area -->
+      <div id="uaiDropZone"
+        style="border:2px dashed #6c63ff88;border-radius:12px;padding:24px;text-align:center;cursor:pointer;margin-bottom:12px;transition:background 0.2s;"
+        onclick="document.getElementById('uaiFileInput').click()"
+        ondragover="event.preventDefault();this.style.background='#6c63ff22';"
+        ondragleave="this.style.background='';"
+        ondrop="uaiHandleDrop(event)">
+        <div style="font-size:2rem;margin-bottom:8px;">📂</div>
+        <div style="font-size:14px;color:var(--text-muted);">JSON ফাইল drag করুন অথবা click করে বেছে নিন</div>
+        <div id="uaiFileName" style="margin-top:8px;font-size:13px;color:#6c63ff;font-weight:600;"></div>
+      </div>
+      <input type="file" id="uaiFileInput" accept=".json" style="display:none;" onchange="uaiFileSelected(this)">
+
+      <!-- Force checkbox -->
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
+        <input type="checkbox" id="uaiForce" style="width:15px;height:15px;">
+        Force (আগের data মুছে নতুন করে import করো)
+      </label>
+
+      <button class="btn btn-primary" onclick="runUploadAndImport()" id="uaiBtn" style="background:linear-gradient(135deg,#6c63ff,#8b5cf6);">
+        ⬆️ আপলোড করুন এবং DB তে দিন
+      </button>
+      <div id="uaiResult" style="margin-top:14px;"></div>
+    </div>
+
+    <!-- ── DB Import (IM-1 + IM-2 + IM-3) ── -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">🗂️</div>
+        <div>
+          <div class="card-title">DB Import (FTS5 + MCQ Bank + CQ Model)</div>
+          <div class="card-subtitle">JSON → chunked import। MCQ Bank ও CQ Model Answers auto-populate হবে।</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <select id="dbImportClass" onchange="loadDbImportSubjects()" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— ক্লাস বেছে নিন —</option>
+        </select>
+        <select id="dbImportSubject" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— বিষয় বেছে নিন —</option>
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
+        <input type="checkbox" id="dbImportForce" style="width:15px;height:15px;">
+        Force re-import (পুরনো data মুছে নতুন করে)
+      </label>
+      <button class="btn btn-primary" onclick="runDbImport()" id="dbImportBtn">🚀 DB Import করুন</button>
+      <button class="btn btn-secondary" onclick="runDeduplicate()" id="deduplicateBtn" style="margin-left:8px;">🔍 Duplicate মুছুন</button>
+      <div id="dbImportResult" style="margin-top:14px;"></div>
+    </div>
+
+    <!-- ── Chapter Sync ── -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">🔄</div>
+        <div>
+          <div class="card-title">Chapter Sync</div>
+          <div class="card-subtitle">DB import এর পরে subject_chapters table refresh করুন।</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        <select id="syncClass" onchange="loadSyncSubjects()" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— ক্লাস —</option>
+        </select>
+        <select id="syncSubject" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— বিষয় —</option>
+        </select>
+      </div>
+      <button class="btn btn-secondary" onclick="runSyncChapters()" id="syncBtn">🔄 Chapter Sync করুন</button>
+      <div id="syncResult" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── MCQ Bank Stats + Manual Import ── -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <div class="card-title">MCQ Bank স্ট্যাটাস</div>
+          <div class="card-subtitle">DB import এ auto-populate হয়। প্রয়োজনে manual import করুন।</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadMcqBankSummary()" style="margin-left:auto;">🔄 Summary</button>
+      </div>
+      <div id="mcqBankSummary" style="margin-bottom:14px;font-size:13px;color:var(--text-muted);">Summary লোড করতে উপরের বোতাম চাপুন</div>
+      <div class="section-title" style="margin-top:8px;">📥 Manual MCQ Import</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <select id="mcqBankClass" onchange="loadMcqBankSubjects()" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— ক্লাস —</option>
+        </select>
+        <select id="mcqBankSubject" style="flex:1;min-width:140px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— বিষয় —</option>
+        </select>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-bottom:14px;cursor:pointer;">
+        <input type="checkbox" id="mcqBankOverwrite" style="width:15px;height:15px;">
+        Overwrite (পুরনো MCQ মুছে নতুন করে)
+      </label>
+      <button class="btn btn-secondary" onclick="runMcqBankImport()" id="mcqBankImportBtn">📥 MCQ Bank Import করুন</button>
+      <div id="mcqBankResult" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 5: FILE MANAGER
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-filemanager">
+
+    <!-- Data JSON Files -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <div class="card-title">ডেটা JSON ফাইল</div>
+          <div class="card-subtitle">ডাউনলোড বা ডিলিট করো</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadFmDataFiles()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="fmDataFiles">
+        <div class="empty-state">
+          <span class="empty-state-icon">📊</span>
+          <div class="empty-state-text">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CQ JSON Files -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📝</div>
+        <div>
+          <div class="card-title">সৃজনশীল (CQ) ফাইল</div>
+          <div class="card-subtitle">বিষয়ভিত্তিক CQ ডাউনলোড বা ডিলিট করো</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadFmCqFiles()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="fmCqFiles">
+        <div class="empty-state">
+          <span class="empty-state-icon">📝</span>
+          <div class="empty-state-text">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Uploaded PDFs -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📄</div>
+        <div>
+          <div class="card-title">আপলোড করা PDF</div>
+          <div class="card-subtitle">মূল PDF ডাউনলোড বা ডিলিট করো (স্প্লিট ফাইলসহ)</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadFmUploadFiles()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="fmUploadFiles">
+        <div class="empty-state">
+          <span class="empty-state-icon">📄</span>
+          <div class="empty-state-text">লোড হচ্ছে...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 6: DB স্বাস্থ্য (নতুন — v15)
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-dbhealth">
+
+    <!-- Table Stats -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📈</div>
+        <div>
+          <div class="card-title">Database Table Stats</div>
+          <div class="card-subtitle">সব main table এর row count ও DB size একনজরে</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadDbStats()" style="margin-left:auto;">🔄 রিফ্রেশ</button>
+      </div>
+      <div id="dbStatsDisplay">
+        <div class="empty-state">
+          <span class="empty-state-icon">📊</span>
+          <div class="empty-state-text">রিফ্রেশ চাপুন</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cache Management -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">🧹</div>
+        <div>
+          <div class="card-title">Response Cache Management</div>
+          <div class="card-subtitle">SQLite response_cache — IM-5 অনুযায়ী শুধু এটাই থাকে</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        <select id="cacheClearClass" onchange="loadCacheClearSubjects()" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— সব ক্লাস —</option>
+        </select>
+        <select id="cacheClearSubject" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— সব বিষয় —</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="runCacheClear('subject')" id="cacheClearSubjectBtn">
+          🧹 Subject Cache Clear
+        </button>
+        <button class="btn btn-danger" onclick="runCacheClear('all')" id="cacheClearAllBtn"
+          style="background:rgba(220,38,38,0.1);color:#dc2626;border:1px solid rgba(220,38,38,0.3);">
+          🗑️ সম্পূর্ণ Cache Clear
+        </button>
+      </div>
+      <div id="cacheClearResult" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- CQ Model Answers Browser -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📖</div>
+        <div>
+          <div class="card-title">CQ Model Answers Browser</div>
+          <div class="card-subtitle">Guide থেকে auto-extracted CQ model answers (cq_model_answers table)</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+        <select id="cqModelClass" onchange="loadCqModelSubjects()" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— ক্লাস —</option>
+        </select>
+        <select id="cqModelSubject" style="flex:1;min-width:130px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-glass);background:var(--bg-card);font-size:14px;">
+          <option value="">— বিষয় —</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" onclick="loadCqModelAnswers()" style="align-self:flex-end;">🔍 দেখুন</button>
+      </div>
+      <div id="cqModelList">
+        <div class="empty-state">
+          <span class="empty-state-icon">📖</span>
+          <div class="empty-state-text">ক্লাস ও বিষয় বেছে দেখুন</div>
+        </div>
+      </div>
+      <div id="cqModelPager" style="display:flex;gap:8px;margin-top:12px;align-items:center;"></div>
+    </div>
+
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       TAB 4: CQ MANAGEMENT
+       ════════════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-cq">
+    <!-- CQ List -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">📝</div>
+        <div>
+          <div class="card-title">সৃজনশীল প্রশ্ন (CQ) ম্যানেজমেন্ট</div>
+          <div class="card-subtitle">সৃজনশীল প্রশ্ন যোগ, দেখুন ও মুছুন</div>
+        </div>
+      </div>
+
+      <!-- Class & Subject Selection -->
+      <div class="form-row" style="margin-bottom: 20px;">
+        <div class="form-group">
+          <label class="form-label">শ্রেণি</label>
+          <select class="form-select" id="cqClassSelect" onchange="onCqClassChange()">
+            <option value="">— শ্রেণি বাছুন —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">গ্রুপ</label>
+          <select class="form-select" id="cqGroupSelect" onchange="onCqGroupChange()" disabled>
+            <option value="">— গ্রুপ বাছুন —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">বিষয়</label>
+          <select class="form-select" id="cqSubjectSelect" onchange="loadCqFiles()" disabled>
+            <option value="">— বিষয় বাছুন —</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="cqFilesList">
+        <div class="empty-state">
+          <span class="empty-state-icon">📝</span>
+          <div class="empty-state-text">শ্রেণি ও বিষয় নির্বাচন করুন</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add New CQ -->
+    <div class="glass-card">
+      <div class="card-header">
+        <div class="card-icon">➕</div>
+        <div>
+          <div class="card-title">নতুন সৃজনশীল প্রশ্ন যোগ করুন</div>
+          <div class="card-subtitle">ম্যানুয়ালি CQ তৈরি করুন</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">অধ্যায় / টপিক</label>
+        <input type="text" class="form-input" id="cqChapterInput" placeholder="যেমন: অধ্যায় ৩ — তাপগতিবিদ্যা">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">উদ্দীপক / প্রশ্নের বিবরণ</label>
+        <textarea class="form-textarea" id="cqQuestionInput" placeholder="উদ্দীপক বা প্রশ্নের মূল অংশ লিখুন..."></textarea>
+      </div>
+
+      <div class="section-title" style="margin-top: 20px;">📌 প্রশ্নের অংশসমূহ</div>
+
+      <div id="cqPartsContainer">
+        <!-- Dynamic parts will be added here -->
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="addCqPart()">
+          ➕ অংশ যোগ করুন
+        </button>
+        <button class="btn btn-primary" onclick="saveCq()" id="saveCqBtn">
+          💾 CQ সেভ করুন
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════ */
+const state = {
+  classes: null,
+  uploadedFile: null,
+  uploadedFilename: null,
+  currentJobId: null,
+  currentGroupId: null,
+  splitDone: false,
+  pollTimer: null,
+  selectedDataFiles: new Set(),
+  cqPartCounter: 0,
+  jsonFile: null
+};
+
+const CQ_LABELS = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
+
+/* ══════════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+   ══════════════════════════════════════════════════════════ */
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || icons.info}</span>
+    <span>${message}</span>
+    <button class="toast-close" onclick="dismissToast(this)">✕</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => dismissToast(toast.querySelector('.toast-close')), 4500);
+}
+
+function dismissToast(btn) {
+  const toast = btn.closest ? btn.closest('.toast') : btn.parentElement;
+  if (!toast || toast.classList.contains('hiding')) return;
+  toast.classList.add('hiding');
+  setTimeout(() => toast.remove(), 300);
+}
+
+/* ══════════════════════════════════════════════════════════
+   API HELPERS
+   ══════════════════════════════════════════════════════════ */
+const API_BASE = '/admin';
+async function apiFetch(url, options = {}) {
+  url = API_BASE + url;
+  try {
+    const resp = await fetch(url, options);
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || data.message || `HTTP ${resp.status}`);
+    return data;
+  } catch (err) {
+    throw err;
+  }
+}
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB SYSTEM
+   ══════════════════════════════════════════════════════════ */
+function initTabs() {
+  const tabBar = document.getElementById('tabBar');
+  const btns = tabBar.querySelectorAll('.tab-btn');
+  const indicator = document.getElementById('tabIndicator');
+
+  function setActiveTab(btn) {
+    btns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+
+    updateIndicator(btn);
+  }
+
+  function updateIndicator(btn) {
+    indicator.style.left = btn.offsetLeft + 'px';
+    indicator.style.width = btn.offsetWidth + 'px';
+  }
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => setActiveTab(btn));
+  });
+
+  // Initialize indicator position
+  const activeBtn = tabBar.querySelector('.tab-btn.active');
+  if (activeBtn) updateIndicator(activeBtn);
+
+  window.addEventListener('resize', () => {
+    const active = tabBar.querySelector('.tab-btn.active');
+    if (active) updateIndicator(active);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB 1: API KEY STATUS (.env থেকে auto-load)
+   ══════════════════════════════════════════════════════════ */
+async function loadApiKeyStatus() {
+  const el = document.getElementById('apiKeyStatus');
+  if (!el) return;
+  try {
+    const data = await apiFetch('/api/key-status');
+    const active = data.active_keys || 0;
+    const total  = data.total_keys  || active;
+
+    if (active === 0) {
+      el.innerHTML = `
+        <div class="status-pill error">
+          <span class="dot"></span>
+          ❌ কোনো API Key কাজ করছে না — .env ফাইল চেক করুন
+        </div>`;
+      return;
+    }
+
+    // summary pill
+    const allOk = active === total;
+    const summaryHtml = `
+      <div class="status-pill ${allOk ? 'success' : 'warning'}" style="margin-bottom:10px;">
+        <span class="dot"></span>
+        ${allOk ? '✅' : '⚠️'} ${active}/${total} API Key সক্রিয়
+        ${!allOk ? `<span style="color:#f59e0b;font-size:11px;margin-left:4px;">(${total - active}টা কাজ করছে না)</span>` : ''}
+      </div>`;
+
+    // per-key rows
+    let keysHtml = '';
+    if (data.keys && data.keys.length > 0) {
+      keysHtml = '<div style="display:flex;flex-direction:column;gap:6px;">';
+      data.keys.forEach(k => {
+        const ok    = allOk || k.active;
+        const color = ok ? '#16a34a' : '#dc2626';
+        const icon  = ok ? '✅' : '❌';
+        keysHtml += `
+          <div style="display:flex;align-items:center;gap:8px;background:${ok ? 'rgba(22,163,74,0.06)' : 'rgba(220,38,38,0.06)'};border:1px solid ${ok ? 'rgba(22,163,74,0.2)' : 'rgba(220,38,38,0.2)'};border-radius:8px;padding:8px 12px;">
+            <span style="font-size:16px;">${icon}</span>
+            <span style="font-weight:600;color:var(--text-secondary);font-size:13px;">Key ${k.index}</span>
+            <code style="font-size:12px;color:${color};flex:1;">${k.masked}</code>
+            <span style="font-size:11px;color:${color};font-weight:600;">${ok ? 'সক্রিয়' : 'ব্যর্থ'}</span>
+          </div>`;
+      });
+      keysHtml += '</div>';
+    } else {
+      // fallback: just show summary
+      keysHtml = `<div style="font-size:12px;color:var(--text-muted);">Parallel mode এ ${active}টি key ব্যবহার হবে</div>`;
+    }
+
+    el.innerHTML = summaryHtml + keysHtml;
+  } catch (e) {
+    el.innerHTML = `
+      <div class="status-pill warning">
+        <span class="dot"></span>
+        স্ট্যাটাস পাওয়া যায়নি
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CASCADING DROPDOWNS (shared logic)
+   ══════════════════════════════════════════════════════════ */
+async function loadClasses() {
+  try {
+    const data = await apiFetch('/api/classes');
+    state.classes = data;
+
+    // Populate all class dropdowns
+    ['pdfClassSelect', 'cqClassSelect'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— শ্রেণি বাছুন —</option>';
+      for (const [key, cls] of Object.entries(data)) {
+        sel.innerHTML += `<option value="${key}">${cls.icon || '🎓'} ${cls.label}</option>`;
+      }
+    });
+  } catch (e) {
+    showToast('ক্লাস লোড ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+function populateGroups(classId, groupSelectId, subjectSelectId) {
+  const groupSel = document.getElementById(groupSelectId);
+  const subjSel = document.getElementById(subjectSelectId);
+
+  groupSel.innerHTML = '<option value="">— গ্রুপ বাছুন —</option>';
+  subjSel.innerHTML = '<option value="">— বিষয় বাছুন —</option>';
+  subjSel.disabled = true;
+
+  if (!classId || !state.classes || !state.classes[classId]) {
+    groupSel.disabled = true;
+    return;
+  }
+
+  const groups = state.classes[classId].groups;
+  for (const [key, grp] of Object.entries(groups)) {
+    groupSel.innerHTML += `<option value="${key}">${grp.label}</option>`;
+  }
+  groupSel.disabled = false;
+}
+
+function populateSubjects(classId, groupId, subjectSelectId) {
+  const subjSel = document.getElementById(subjectSelectId);
+  subjSel.innerHTML = '<option value="">— বিষয় বাছুন —</option>';
+
+  if (!classId || !groupId || !state.classes) {
+    subjSel.disabled = true;
+    return;
+  }
+
+  const group = state.classes[classId]?.groups?.[groupId];
+  if (!group) { subjSel.disabled = true; return; }
+
+  const subjects = group.subjects || {};
+  const fourthSubjects = group['4th_subjects'] || {};
+
+  for (const [key, subj] of Object.entries(subjects)) {
+    subjSel.innerHTML += `<option value="${key}">${subj.icon || ''} ${subj.bn}</option>`;
+  }
+  if (Object.keys(fourthSubjects).length > 0) {
+    const optGroup = document.createElement('optgroup');
+    optGroup.label = '── ৪র্থ বিষয় ──';
+    for (const [key, subj] of Object.entries(fourthSubjects)) {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = `${subj.icon || ''} ${subj.bn}`;
+      optGroup.appendChild(opt);
+    }
+    subjSel.appendChild(optGroup);
+  }
+  subjSel.disabled = false;
+}
+
+// PDF tab dropdowns
+function onPdfClassChange() {
+  const classId = document.getElementById('pdfClassSelect').value;
+  populateGroups(classId, 'pdfGroupSelect', 'pdfSubjectSelect');
+}
+function onPdfGroupChange() {
+  const classId = document.getElementById('pdfClassSelect').value;
+  const groupId = document.getElementById('pdfGroupSelect').value;
+  populateSubjects(classId, groupId, 'pdfSubjectSelect');
+}
+
+// CQ tab dropdowns
+function onCqClassChange() {
+  const classId = document.getElementById('cqClassSelect').value;
+  populateGroups(classId, 'cqGroupSelect', 'cqSubjectSelect');
+}
+function onCqGroupChange() {
+  const classId = document.getElementById('cqClassSelect').value;
+  const groupId = document.getElementById('cqGroupSelect').value;
+  populateSubjects(classId, groupId, 'cqSubjectSelect');
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB 2: PDF UPLOAD & EXTRACT
+   ══════════════════════════════════════════════════════════ */
+function initUploadZone(zoneId, inputId) {
+  const zone = document.getElementById(zoneId);
+  if (!zone) return;
+
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const input = document.getElementById(inputId);
+    if (e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+}
+
+function onFileSelected(input) {
+  const file = input.files[0];
+  const zone = document.getElementById('uploadZone');
+  const infoEl = document.getElementById('fileInfoDisplay');
+
+  if (!file) {
+    state.uploadedFile = null;
+    zone.classList.remove('has-file');
+    infoEl.style.display = 'none';
+    document.getElementById('uploadBtn').disabled = true;
+    return;
+  }
+
+  state.uploadedFile = file;
+  zone.classList.add('has-file');
+  infoEl.style.display = 'block';
+  infoEl.innerHTML = `
+    <div class="file-info">
+      <span>📄</span>
+      <span class="file-info-name">${file.name}</span>
+      <span class="file-info-size">${formatBytes(file.size)}</span>
+    </div>`;
+  document.getElementById('uploadBtn').disabled = false;
+}
+
+async function uploadPdf() {
+  const classId = document.getElementById('pdfClassSelect').value;
+  const subjectId = document.getElementById('pdfSubjectSelect').value;
+
+  if (!classId) { showToast('শ্রেণি নির্বাচন করুন', 'error'); return; }
+  if (!subjectId) { showToast('বিষয় নির্বাচন করুন', 'error'); return; }
+  if (!state.uploadedFile) { showToast('PDF ফাইল নির্বাচন করুন', 'error'); return; }
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> আপলোড হচ্ছে...';
+
+  const formData = new FormData();
+  formData.append('file', state.uploadedFile);
+  formData.append('class_id', classId);
+  formData.append('subject_id', subjectId);
+
+  try {
+    const data = await apiFetch('/api/upload', { method: 'POST', body: formData });
+    state.uploadedFilename = data.filename;
+    state.splitDone = false;
+    showToast('PDF সফলভাবে আপলোড হয়েছে!', 'success');
+    document.getElementById('stepSelect').classList.add('completed');
+    document.getElementById('stepUpload').classList.add('completed');
+    document.getElementById('splitBtn').disabled = false;
+    document.getElementById('extractBtn').disabled = false;
+  } catch (e) {
+    showToast('আপলোড ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📤 আপলোড করুন';
+  }
+}
+
+async function splitPdf() {
+  const parts = document.getElementById('splitPartsInput').value;
+  const classId = document.getElementById('pdfClassSelect').value;
+  const subjectId = document.getElementById('pdfSubjectSelect').value;
+  if (!classId || !subjectId) { showToast('ভাগ ব্যর্থ: শ্রেণি ও বিষয় নির্বাচন করুন', 'error'); return; }
+  const btn = document.getElementById('splitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> ভাগ হচ্ছে...';
+
+  try {
+    const data = await apiFetch('/api/split', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId, parts: parseInt(parts) })
+    });
+    state.splitDone = true;
+    showToast('PDF সফলভাবে ভাগ হয়েছে!', 'success');
+    const resultEl = document.getElementById('splitResult');
+    if (data.files && data.files.length) {
+      resultEl.innerHTML = `
+        <div class="data-list">
+          ${data.files.map(f => `
+            <div class="data-item">
+              <span class="data-item-icon">📄</span>
+              <div class="data-item-info">
+                <div class="data-item-name">${f.name || f}</div>
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+    document.getElementById('stepSplit').classList.add('completed');
+  } catch (e) {
+    showToast('ভাগ ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✂️ ভাগ করুন';
+  }
+}
+
+async function loadModels() {
+  try {
+    const data = await apiFetch('/api/models');
+    const sel = document.getElementById('modelSelect');
+    sel.innerHTML = '<option value="">— মডেল বাছুন —</option>';
+    const models = data.models || data;
+    if (Array.isArray(models)) {
+      models.forEach(m => {
+        const id = typeof m === 'string' ? m : m.id;
+        const label = typeof m === 'string' ? m : (m.label || m.id);
+        sel.innerHTML += `<option value="${id}">${label}</option>`;
+      });
+    } else if (typeof models === 'object') {
+      for (const [key, val] of Object.entries(models)) {
+        sel.innerHTML += `<option value="${key}">${val.label || key}</option>`;
+      }
+    }
+  } catch (e) {
+    // Silently fail on models load
+  }
+}
+
+async function startExtraction() {
+  const model = document.getElementById('modelSelect').value;
+  const promptType = document.getElementById('promptTypeSelect')?.value || 'board_book';
+  const classId = document.getElementById('pdfClassSelect').value;
+  const subjectId = document.getElementById('pdfSubjectSelect').value;
+  const btn = document.getElementById('extractBtn');
+
+  if (!classId || !subjectId) { showToast('শুরু ব্যর্থ: শ্রেণি ও বিষয় নির্বাচন করুন', 'error'); return; }
+  if (!state.uploadedFilename) { showToast('শুরু ব্যর্থ: আগে PDF আপলোড করুন', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> শুরু হচ্ছে...';
+
+  try {
+    let data;
+    // split হয়ে থাকলে parallel mode, না হলে single mode
+    if (state.splitDone) {
+      data = await apiFetch('/api/start-parallel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: classId, subject_id: subjectId, model: model || undefined, prompt_type: promptType })
+      });
+      state.currentGroupId = data.group_id;
+      state.currentJobId = null;
+      showToast(`${data.num_parts}টা parallel worker শুরু হয়েছে! ✅`, 'success');
+    } else {
+      data = await apiFetch('/api/start-extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: state.uploadedFilename, class_id: classId, subject_id: subjectId, model: model || undefined, prompt_type: promptType })
+      });
+      state.currentJobId = data.job_id || data.id;
+      state.currentGroupId = null;
+      showToast('এক্সট্রাকশন শুরু হয়েছে!', 'success');
+    }
+
+    document.getElementById('stepExtract').classList.add('completed');
+    document.getElementById('progressCard').style.display = 'block';
+    // clear old per-key progress
+    document.getElementById('parallelProgressRows').innerHTML = '';
+    startPolling();
+  } catch (e) {
+    showToast('শুরু ব্যর্থ: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 এক্সট্রাকশন শুরু করুন';
+  }
+}
+
+function startPolling() {
+  if (state.pollTimer) clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(pollJobStatus, 2000);
+  pollJobStatus();
+}
+
+async function pollJobStatus() {
+  try {
+    if (state.currentGroupId) {
+      // ── Parallel mode: poll the group ──
+      const data = await apiFetch(`/api/group/${state.currentGroupId}`);
+      const jobs = data.jobs || [];
+      const numParts = jobs.length || 1;
+
+      // overall progress = average of all parts
+      let totalDone = 0, totalPages = 0;
+      jobs.forEach(j => {
+        totalDone  += j.current_page || 0;
+        totalPages += j.total_pages  || 0;
+      });
+      if (totalPages === 0) totalPages = 1;
+      const pct = Math.min(100, Math.round((totalDone / totalPages) * 100));
+
+      document.getElementById('progressLabel').textContent = `পেজ: ${totalDone}/${totalPages}`;
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+      document.getElementById('progressSubtitle').textContent =
+        `${numParts}টা Gemini key দিয়ে parallel এক্সট্রাকশন চলছে...`;
+
+      // per-key rows
+      const rowsEl = document.getElementById('parallelProgressRows');
+      rowsEl.innerHTML = jobs.map((j, i) => {
+        const jp = j.total_pages > 0 ? Math.min(100, Math.round((j.current_page / j.total_pages) * 100)) : 0;
+        const jStatus = (j.status === 'completed' || j.status === 'done') ? '✅'
+          : (j.status === 'failed' || j.status === 'error') ? '❌'
+          : (j.status === 'starting') ? '⏳' : '🔄';
+        const color = (j.status === 'completed' || j.status === 'done') ? '#16a34a'
+          : (j.status === 'failed' || j.status === 'error') ? '#dc2626' : '#7c3aed';
+        return `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+              <span style="font-size:12px;font-weight:600;">
+                ${jStatus} Key ${i+1} — Part ${j.part_num || i+1}
+              </span>
+              <span style="font-size:12px;color:${color};font-weight:700;">${jp}%  (${j.current_page||0}/${j.total_pages||0} পেজ)</span>
+            </div>
+            <div style="background:#e5e7eb;border-radius:4px;height:6px;overflow:hidden;">
+              <div style="width:${jp}%;background:${color};height:100%;border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px;">${j.message || ''}</div>
+          </div>`;
+      }).join('');
+
+      const groupStatus = data.status;
+      if (groupStatus === 'completed' || groupStatus === 'done' || (data.merged)) {
+        clearInterval(state.pollTimer); state.pollTimer = null;
+        document.getElementById('progressSubtitle').textContent = '✅ সব part merge সম্পন্ন!';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        showToast('Parallel এক্সট্রাকশন ও merge সম্পন্ন! ✅', 'success');
+        document.getElementById('extractBtn').disabled = false;
+        document.getElementById('extractBtn').innerHTML = '🚀 এক্সট্রাকশন শুরু করুন';
+        showPostExtractCard();
+        loadJobs();
+      } else if (groupStatus === 'failed') {
+        clearInterval(state.pollTimer); state.pollTimer = null;
+        document.getElementById('progressSubtitle').textContent = '❌ ব্যর্থ হয়েছে';
+        showToast('Parallel এক্সট্রাকশন ব্যর্থ!', 'error');
+        document.getElementById('extractBtn').disabled = false;
+        document.getElementById('extractBtn').innerHTML = '🚀 এক্সট্রাকশন শুরু করুন';
+      }
+
+    } else if (state.currentJobId) {
+      // ── Single mode ──
+      const data = await apiFetch(`/api/job/${state.currentJobId}`);
+      const done  = data.current_page || 0;
+      const total = data.total_pages  || 1;
+      const pct   = Math.min(100, Math.round((done / total) * 100));
+      const status = data.status || 'running';
+
+      document.getElementById('progressLabel').textContent = `পেজ: ${done}/${total}`;
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+      document.getElementById('progressSubtitle').textContent = data.message || 'প্রসেসিং চলছে...';
+      document.getElementById('parallelProgressRows').innerHTML = '';
+
+      if (status === 'completed' || status === 'done' || pct >= 100) {
+        clearInterval(state.pollTimer); state.pollTimer = null;
+        document.getElementById('progressSubtitle').textContent = '✅ সম্পন্ন!';
+        document.getElementById('progressFill').style.width = '100%';
+        document.getElementById('progressPercent').textContent = '100%';
+        showToast('এক্সট্রাকশন সম্পন্ন হয়েছে!', 'success');
+        document.getElementById('extractBtn').disabled = false;
+        document.getElementById('extractBtn').innerHTML = '🚀 এক্সট্রাকশন শুরু করুন';
+        showPostExtractCard();
+        loadJobs();
+      } else if (status === 'failed' || status === 'error') {
+        clearInterval(state.pollTimer); state.pollTimer = null;
+        document.getElementById('progressSubtitle').textContent = '❌ ব্যর্থ হয়েছে';
+        showToast('এক্সট্রাকশন ব্যর্থ!', 'error');
+        document.getElementById('extractBtn').disabled = false;
+        document.getElementById('extractBtn').innerHTML = '🚀 এক্সট্রাকশন শুরু করুন';
+      }
+
+      const errorsEl = document.getElementById('progressErrors');
+      if (data.errors && data.errors.length) {
+        errorsEl.style.display = 'block';
+        errorsEl.innerHTML = `<div class="job-error"><strong>ত্রুটিসমূহ:</strong><br>${data.errors.map(e => `• ${e}`).join('<br>')}</div>`;
+      }
+    }
+  } catch (e) { /* silently retry */ }
+}
+
+async function loadJobs() {
+  const el = document.getElementById('jobsList');
+  try {
+    const data = await apiFetch('/api/jobs');
+    const jobs = data.jobs || data;
+
+    if (!jobs || !jobs.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">📋</span>
+          <div class="empty-state-text">কোনো জব নেই</div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = jobs.map(job => {
+      const st = job.status || '';
+      const statusClass = (st === 'completed' || st === 'done') ? 'success'
+        : (st === 'failed' || st === 'error' || st === 'cancelled') ? 'error' : 'warning';
+      const statusText = (st === 'completed' || st === 'done') ? '✅ সম্পন্ন'
+        : (st === 'failed' || st === 'error') ? '❌ ব্যর্থ'
+        : st === 'cancelled' ? '🚫 বাতিল'
+        : st === 'running' ? '⏳ চলমান' : '🔄 শুরু হচ্ছে';
+
+      const startedDate = job.started_at
+        ? new Date(job.started_at * 1000).toLocaleString('bn-BD', {hour:'2-digit',minute:'2-digit',day:'numeric',month:'short'})
+        : '';
+      const entries = job.total_entries || job.entries_done || '';
+
+      return `
+        <div class="job-item">
+          <div class="job-header">
+            <span class="job-id">Job #${job.job_id || job.id || '—'}${job.part_num ? ` (Part ${job.part_num})` : ''}</span>
+            <span class="status-pill ${statusClass}">
+              <span class="dot"></span> ${statusText}
+            </span>
+          </div>
+          <div class="job-details">
+            ${job.subject_bn ? `📚 ${job.subject_bn}` : ''}
+            ${job.class_id ? ` • 🎓 ${job.class_id.toUpperCase()}` : ''}
+            ${job.prompt_type ? ` • 📄 ${job.prompt_type}` : ''}
+            ${job.model ? ` • 🤖 ${job.model}` : ''}
+          </div>
+          <div class="job-details" style="margin-top:2px;">
+            ${job.total_pages ? `📑 ${job.current_page||0}/${job.total_pages} পেজ` : ''}
+            ${entries ? ` • 📝 ${entries} এন্ট্রি` : ''}
+            ${startedDate ? ` • 🕐 ${startedDate}` : ''}
+          </div>
+          ${job.message ? `<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">💬 ${job.message}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    // Resume-able jobs check
+    try {
+      const progData = await apiFetch('/api/progress-files');
+      if (progData && progData.length) {
+        const resumeHtml = progData.map(p =>
+          `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:8px;margin-top:6px;gap:8px;">
+            <div style="font-size:13px;">
+              ⚠️ <strong>${p.class_id ? p.class_id.toUpperCase() : ''} › ${p.subject_id}</strong>
+              — পেজ ${p.last_page} পর্যন্ত (${p.entries_done} এন্ট্রি)
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">Extraction দিলে auto-resume</span>
+          </div>`
+        ).join('');
+        el.insertAdjacentHTML('beforeend', `
+          <div style="margin-top:12px;">
+            <div style="font-size:12px;font-weight:600;color:#d97706;margin-bottom:4px;">⏸ Resume করা যাবে:</div>
+            ${resumeHtml}
+          </div>`);
+      }
+    } catch(e) { /* ignore */ }
+
+  } catch (e) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">⚠️</span>
+        <div class="empty-state-text">জব লোড ব্যর্থ</div>
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB 3: DATA MANAGEMENT
+   ══════════════════════════════════════════════════════════ */
+async function loadDataFiles() {
+  const el = document.getElementById('dataFilesList');
+  state.selectedDataFiles.clear();
+  document.getElementById('mergeBtn').disabled = true;
+
+  try {
+    const data = await apiFetch('/api/data-files');
+    const files = data.files || data;
+
+    if (!files || !files.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">📂</span>
+          <div class="empty-state-text">কোনো ডেটা ফাইল নেই</div>
+        </div>`;
+      return;
+    }
+
+    // Group by class_id → group_folder for organized tree view
+    const tree = {};
+    files.forEach(f => {
+      const cid = f.class_id || 'other';
+      const grp = f.group_folder || 'universal';
+      if (!tree[cid]) tree[cid] = {};
+      if (!tree[cid][grp]) tree[cid][grp] = [];
+      tree[cid][grp].push(f);
+    });
+
+    const classLabels = { ssc: '🎓 SSC (নবম-দশম)', hsc: '🎓 HSC (একাদশ-দ্বাদশ)', other: '📁 অন্যান্য' };
+    const groupLabels = { universal: '📚 বাধ্যতামূলক', science: '🔬 বিজ্ঞান', business: '💼 ব্যবসায়', humanities: '🏛️ মানবিক', other: '📁 অন্যান্য' };
+
+    let html = '';
+    for (const [cid, groups] of Object.entries(tree)) {
+      html += `<div style="margin-bottom:18px;">
+        <div style="font-size:14px;font-weight:700;color:#1e293b;padding:8px 0 6px;border-bottom:2px solid #e2e8f0;margin-bottom:10px;">
+          ${classLabels[cid] || cid.toUpperCase()}
+        </div>`;
+      for (const [grpId, grpFiles] of Object.entries(groups)) {
+        html += `<div style="margin-bottom:12px;margin-left:8px;">
+          <div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;letter-spacing:0.5px;">
+            ${groupLabels[grpId] || grpId}
+          </div>
+          <div class="data-list" style="margin-left:8px;">`;
+        grpFiles.forEach(f => {
+          const name = f.filename || f.name || f;
+          const filepath = f.filepath || name;
+          const size = f.size_kb ? f.size_kb + ' KB' : '';
+          const entries = f.entries || f.count || 0;
+          const subjectLabel = f.subject_bn || f.subject_id || name;
+          html += `
+            <div class="data-item">
+              <input type="checkbox" class="data-item-check" value="${filepath}" onchange="toggleDataFileSelection(this)">
+              <span class="data-item-icon">${f.source_type === 'board_book' ? '📚' : f.source_type === 'test_paper' ? '📝' : f.source_type === 'guide' ? '📖' : '📊'}</span>
+              <div class="data-item-info">
+                <div class="data-item-name">${subjectLabel}${f.source_type ? ` <span style="font-size:10px;color:#7c3aed;background:rgba(124,58,237,0.1);padding:1px 5px;border-radius:4px;">${f.source_type}</span>` : ''}</div>
+                <div class="data-item-meta">${entries}টি এন্ট্রি • ${size} • <span style="color:#94a3b8;font-size:10px;">${filepath}</span></div>
+              </div>
+              <div class="data-item-actions">
+                <a href="/admin/api/download-data/${encodeURIComponent(filepath)}" class="btn btn-secondary btn-sm" download>⬇️</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteDataFile('${filepath}')">🗑️</button>
+              </div>
+            </div>`;
+        });
+        html += `</div></div>`;
+      }
+      html += `</div>`;
+    }
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">⚠️</span>
+        <div class="empty-state-text">ফাইল লোড ব্যর্থ</div>
+      </div>`;
+  }
+}
+
+function toggleDataFileSelection(checkbox) {
+  if (checkbox.checked) {
+    state.selectedDataFiles.add(checkbox.value);
+  } else {
+    state.selectedDataFiles.delete(checkbox.value);
+  }
+  document.getElementById('mergeBtn').disabled = state.selectedDataFiles.size < 2;
+}
+
+async function deleteDataFile(name) {
+  if (!confirm(`"${name}" ফাইলটি মুছে ফেলতে চান?`)) return;
+
+  try {
+    const res = await apiFetch('/api/delete-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: name })
+    });
+    showToast(res.message || 'ফাইল মুছে ফেলা হয়েছে!', 'success');
+    loadDataFiles();
+  } catch (e) {
+    showToast('মুছতে ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+async function mergeFiles() {
+  if (state.selectedDataFiles.size < 2) {
+    showToast('কমপক্ষে ২টি ফাইল নির্বাচন করুন', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('mergeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> মার্জ হচ্ছে...';
+
+  try {
+    await apiFetch('/api/merge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ files: Array.from(state.selectedDataFiles) })
+    });
+    showToast('ফাইল সফলভাবে মার্জ হয়েছে!', 'success');
+    loadDataFiles();
+  } catch (e) {
+    showToast('মার্জ ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔗 নির্বাচিত ফাইল মার্জ করুন';
+  }
+}
+
+function onJsonFileSelected(input) {
+  const file = input.files[0];
+  const zone = document.getElementById('jsonUploadZone');
+  const infoEl = document.getElementById('jsonFileInfoDisplay');
+
+  if (!file) {
+    state.jsonFile = null;
+    zone.classList.remove('has-file');
+    infoEl.style.display = 'none';
+    document.getElementById('uploadJsonBtn').disabled = true;
+    return;
+  }
+
+  state.jsonFile = file;
+  zone.classList.add('has-file');
+  infoEl.style.display = 'block';
+  infoEl.innerHTML = `
+    <div class="file-info">
+      <span>📋</span>
+      <span class="file-info-name">${file.name}</span>
+      <span class="file-info-size">${formatBytes(file.size)}</span>
+    </div>`;
+  document.getElementById('uploadJsonBtn').disabled = false;
+}
+
+async function uploadJson() {
+  if (!state.jsonFile) { showToast('JSON ফাইল নির্বাচন করুন', 'error'); return; }
+
+  const btn = document.getElementById('uploadJsonBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> আপলোড হচ্ছে...';
+
+  const formData = new FormData();
+  formData.append('file', state.jsonFile);
+
+  try {
+    await apiFetch('/api/upload-json', { method: 'POST', body: formData });
+    showToast('JSON সফলভাবে আপলোড হয়েছে!', 'success');
+    state.jsonFile = null;
+    document.getElementById('jsonFileInput').value = '';
+    document.getElementById('jsonUploadZone').classList.remove('has-file');
+    document.getElementById('jsonFileInfoDisplay').style.display = 'none';
+    document.getElementById('uploadJsonBtn').disabled = true;
+    loadDataFiles();
+  } catch (e) {
+    showToast('আপলোড ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📥 JSON আপলোড করুন';
+  }
+}
+
+async function loadSplitFiles() {
+  const el = document.getElementById('splitFilesList');
+  try {
+    const data = await apiFetch('/api/split-files');
+    const files = data.files || data;
+
+    if (!files || !files.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">✂️</span>
+          <div class="empty-state-text">কোনো স্প্লিট ফাইল নেই</div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="data-list">${files.map(f => {
+      const name = f.name || f.filename || f;
+      const size = f.size ? formatBytes(f.size) : '';
+      return `
+        <div class="data-item">
+          <span class="data-item-icon">📄</span>
+          <div class="data-item-info">
+            <div class="data-item-name">${name}</div>
+            <div class="data-item-meta">${size}</div>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  } catch (e) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">⚠️</span>
+        <div class="empty-state-text">ফাইল লোড ব্যর্থ</div>
+      </div>`;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   TAB 4: CQ MANAGEMENT
+   ══════════════════════════════════════════════════════════ */
+async function loadCqFiles() {
+  const classId = document.getElementById('cqClassSelect').value;
+  const subjectId = document.getElementById('cqSubjectSelect').value;
+  const el = document.getElementById('cqFilesList');
+
+  if (!classId || !subjectId) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">📝</span>
+        <div class="empty-state-text">শ্রেণি ও বিষয় নির্বাচন করুন</div>
+      </div>`;
+    return;
+  }
+
+  try {
+    const data = await apiFetch(`/api/cq-files?class_id=${classId}&subject_id=${subjectId}`);
+    const cqs = data.cqs || data.files || data;
+
+    if (!cqs || !cqs.length) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-state-icon">📝</span>
+          <div class="empty-state-text">কোনো CQ নেই — নিচে থেকে যোগ করুন</div>
+        </div>`;
+      return;
+    }
+
+    el.innerHTML = `<div class="data-list">${cqs.map((cq, idx) => {
+      const chapter = cq.chapter || cq.topic || '';
+      const question = cq.question || cq.text || '';
+      const preview = question.length > 100 ? question.substring(0, 100) + '...' : question;
+      const id = cq.id || idx;
+
+      return `
+        <div class="data-item" style="align-items: flex-start;">
+          <span class="data-item-icon">📝</span>
+          <div class="data-item-info">
+            <div class="data-item-name">${chapter}</div>
+            <div class="data-item-meta" style="color: var(--text-secondary); font-family: var(--font-bn); margin-top: 6px;">
+              ${preview}
+            </div>
+            ${cq.parts && cq.parts.length ? `
+              <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                ${cq.parts.map(p => `
+                  <span style="
+                    font-size: 11px;
+                    padding: 2px 10px;
+                    border-radius: 12px;
+                    background: rgba(99,102,241,0.1);
+                    color: var(--accent-3);
+                    border: 1px solid rgba(99,102,241,0.15);
+                  ">(${p.label}) ${p.marks || ''}নম্বর</span>
+                `).join('')}
+              </div>` : ''}
+          </div>
+          <div class="data-item-actions">
+            <button class="btn btn-danger btn-sm" onclick="deleteCq('${id}', '${classId}', '${subjectId}')">
+              🗑️ মুছুন
+            </button>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+  } catch (e) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">⚠️</span>
+        <div class="empty-state-text">CQ লোড ব্যর্থ</div>
+      </div>`;
+  }
+}
+
+async function deleteCq(id, classId, subjectId) {
+  if (!confirm('এই CQ মুছে ফেলতে চান?')) return;
+
+  try {
+    await apiFetch('/api/cq/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, class_id: classId, subject_id: subjectId })
+    });
+    showToast('CQ মুছে ফেলা হয়েছে!', 'success');
+    loadCqFiles();
+  } catch (e) {
+    showToast('মুছতে ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+function addCqPart() {
+  const container = document.getElementById('cqPartsContainer');
+  const idx = state.cqPartCounter++;
+  const label = CQ_LABELS[container.children.length] || String.fromCharCode(2453 + container.children.length); // Bengali chars
+
+  const part = document.createElement('div');
+  part.className = 'cq-part';
+  part.dataset.partId = idx;
+  part.innerHTML = `
+    <div class="cq-part-label">
+      <select class="form-select" data-field="label" style="font-size: 16px; text-align: center; padding: 8px;">
+        ${CQ_LABELS.map((l, i) => `<option value="${l}" ${i === container.children.length ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="cq-part-text">
+      <textarea class="form-textarea" data-field="text" placeholder="প্রশ্নের অংশ লিখুন..." style="min-height: 60px;"></textarea>
+    </div>
+    <div class="cq-part-marks">
+      <input type="number" class="form-input" data-field="marks" placeholder="নম্বর" min="1" max="10" value="">
+    </div>
+    <button class="btn btn-danger btn-icon btn-sm" onclick="removeCqPart(${idx})" title="মুছুন">✕</button>
+  `;
+  container.appendChild(part);
+}
+
+function removeCqPart(id) {
+  const part = document.querySelector(`.cq-part[data-part-id="${id}"]`);
+  if (part) {
+    part.style.animation = 'fadeSlideIn 0.2s ease reverse';
+    setTimeout(() => part.remove(), 200);
+  }
+}
+
+async function saveCq() {
+  const classId = document.getElementById('cqClassSelect').value;
+  const subjectId = document.getElementById('cqSubjectSelect').value;
+  const chapter = document.getElementById('cqChapterInput').value.trim();
+  const question = document.getElementById('cqQuestionInput').value.trim();
+
+  if (!classId || !subjectId) { showToast('শ্রেণি ও বিষয় নির্বাচন করুন', 'error'); return; }
+  if (!chapter) { showToast('অধ্যায়/টপিক লিখুন', 'error'); return; }
+  if (!question) { showToast('প্রশ্ন লিখুন', 'error'); return; }
+
+  const parts = [];
+  document.querySelectorAll('.cq-part').forEach(partEl => {
+    const label = partEl.querySelector('[data-field="label"]').value;
+    const text = partEl.querySelector('[data-field="text"]').value.trim();
+    const marks = parseInt(partEl.querySelector('[data-field="marks"]').value) || 0;
+    if (text) parts.push({ label, text, marks });
+  });
+
+  if (!parts.length) { showToast('কমপক্ষে একটি অংশ যোগ করুন', 'error'); return; }
+
+  const btn = document.getElementById('saveCqBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> সেভ হচ্ছে...';
+
+  try {
+    await apiFetch('/api/cq/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        class_id: classId,
+        subject_id: subjectId,
+        chapter,
+        question,
+        parts
+      })
+    });
+    showToast('CQ সফলভাবে সেভ হয়েছে!', 'success');
+
+    // Clear form
+    document.getElementById('cqChapterInput').value = '';
+    document.getElementById('cqQuestionInput').value = '';
+    document.getElementById('cqPartsContainer').innerHTML = '';
+    state.cqPartCounter = 0;
+
+    loadCqFiles();
+  } catch (e) {
+    showToast('সেভ ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '💾 CQ সেভ করুন';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   FILE MANAGER — Data Files
+   ══════════════════════════════════════════════════════════ */
+async function loadFmDataFiles() {
+  const el = document.getElementById('fmDataFiles');
+  el.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  try {
+    const summary = await apiFetch('/api/files-summary');
+    const files = summary.data_files || [];
+    if (!files.length) {
+      el.innerHTML = `<div class="empty-state">
+        <span class="empty-state-icon">📊</span>
+        <div class="empty-state-text">কোনো Data ফাইল নেই</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="data-list">${files.map(f => `
+      <div class="data-item">
+        <span class="data-item-icon">📊</span>
+        <div class="data-item-info">
+          <div class="data-item-name">${f.filename}</div>
+          <div class="data-item-meta">${f.count || 0}টি ইন্ট্রি • ${f.size_kb} KB</div>
+        </div>
+        <div class="data-item-actions">
+          <a href="/admin/api/download-data/${encodeURIComponent(f.filename)}"
+             class="btn btn-secondary btn-sm" download>⬇️ ডাউনলোড</a>
+          <button class="btn btn-danger btn-sm"
+            onclick="fmDeleteData('${f.filename}')">🗑️ ডিলিট</button>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-state-icon">⚠️</span><div class="empty-state-text">${e.message}</div></div>`;
+  }
+}
+
+async function fmDeleteData(filename) {
+  if (!confirm(`"${filename}" মুছে ফেলতে চান? এই ফাইল ডিলিট হলে শিক্ষার্থীরা এই বিষয়ের উত্তর পাবে না।`)) return;
+  try {
+    const res = await apiFetch('/api/delete-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename })
+    });
+    showToast(res.message || '✅ ফাইল ডিলিট হয়েছে', 'success');
+    loadFmDataFiles();
+  } catch (e) {
+    showToast('ডিলিট ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   FILE MANAGER — CQ Files
+   ══════════════════════════════════════════════════════════ */
+async function loadFmCqFiles() {
+  const el = document.getElementById('fmCqFiles');
+  el.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  try {
+    const summary = await apiFetch('/api/files-summary');
+    const files = summary.cq_files || [];
+    if (!files.length) {
+      el.innerHTML = `<div class="empty-state">
+        <span class="empty-state-icon">📝</span>
+        <div class="empty-state-text">কোনো CQ ফাইল নেই</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="data-list">${files.map(f => `
+      <div class="data-item">
+        <span class="data-item-icon">📝</span>
+        <div class="data-item-info">
+          <div class="data-item-name">${f.subject_bn || f.subject_id} (${f.class_id?.toUpperCase()})</div>
+          <div class="data-item-meta">${f.count || 0}টি প্রশ্ন • ${f.size_kb} KB • ${f.filename}</div>
+        </div>
+        <div class="data-item-actions">
+          <a href="/admin/api/download-data/${encodeURIComponent(f.filename)}"
+             class="btn btn-secondary btn-sm" download>⬇️ ডাউনলোড</a>
+          <button class="btn btn-danger btn-sm"
+            onclick="fmDeleteCq('${f.filename}')">🗑️ ডিলিট</button>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-state-icon">⚠️</span><div class="empty-state-text">${e.message}</div></div>`;
+  }
+}
+
+async function fmDeleteCq(filename) {
+  if (!confirm(`"${filename}" এর সব CQ প্রশ্ন মুছে ফেলতে চান? এটা পূর্বাবস্থায় ফেরানো যাবে না।`)) return;
+  try {
+    const res = await apiFetch('/api/delete-cq', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename })
+    });
+    showToast(res.message || '✅ CQ ফাইল ডিলিট হয়েছে', 'success');
+    loadFmCqFiles();
+  } catch (e) {
+    showToast('ডিলিট ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   FILE MANAGER — Upload PDFs
+   ══════════════════════════════════════════════════════════ */
+async function loadFmUploadFiles() {
+  const el = document.getElementById('fmUploadFiles');
+  el.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+  try {
+    const summary = await apiFetch('/api/files-summary');
+    const files = summary.upload_files || [];
+    if (!files.length) {
+      el.innerHTML = `<div class="empty-state">
+        <span class="empty-state-icon">📄</span>
+        <div class="empty-state-text">কোনো আপলোড করা PDF নেই</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="data-list">${files.map(f => `
+      <div class="data-item">
+        <span class="data-item-icon">📄</span>
+        <div class="data-item-info">
+          <div class="data-item-name">${f.filename}</div>
+          <div class="data-item-meta">${f.pages || 0} পেজ • ${f.size_kb} KB</div>
+        </div>
+        <div class="data-item-actions">
+          <a href="/admin/api/download-split/${encodeURIComponent(f.filename)}"
+             class="btn btn-secondary btn-sm" download
+             title="শুধু split ফাইল ডাউনলোড করো">⬇️ ডাউনলোড</a>
+          <button class="btn btn-danger btn-sm"
+            onclick="fmDeleteUpload('${f.filename}')">🗑️ ডিলিট</button>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch (e) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-state-icon">⚠️</span><div class="empty-state-text">${e.message}</div></div>`;
+  }
+}
+
+async function fmDeleteUpload(filename) {
+  if (!confirm(`"${filename}" এবং এর সব স্প্লিট ফাইল ডিলিট করতে চান?`)) return;
+  try {
+    const res = await apiFetch('/api/delete-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename })
+    });
+    showToast(res.message || '✅ PDF ডিলিট হয়েছে', 'success');
+    loadFmUploadFiles();
+  } catch (e) {
+    showToast('ডিলিট ব্যর্থ: ' + e.message, 'error');
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   DB IMPORT (IM-1 + IM-2 + IM-3)
+   ══════════════════════════════════════════════════════════ */
+async function loadDbImportSubjects() {
+  const classId = document.getElementById('dbImportClass').value;
+  const sel = document.getElementById('dbImportSubject');
+  sel.innerHTML = '<option value="">— বিষয় লোড হচ্ছে —</option>';
+  if (!classId) return;
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— বিষয় বেছে নিন —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) { sel.innerHTML = '<option value="">— error —</option>'; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   POST-EXTRACT STEP 5
+   ══════════════════════════════════════════════════════════ */
+function showPostExtractCard() {
+  const step = document.getElementById('stepPostExtract');
+  if (!step) return;
+  step.style.display = 'flex';
+  step.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // reset buttons
+  const importBtn = document.getElementById('postImportBtn');
+  const syncBtn   = document.getElementById('postSyncBtn');
+  if (importBtn) { importBtn.disabled = false; importBtn.innerHTML = '🗂️ DB Import করুন'; }
+  if (syncBtn)   { syncBtn.disabled = true; }
+  document.getElementById('postExtractResult').innerHTML = '';
+}
+
+async function runPostExtractImport() {
+  const classId   = document.getElementById('pdfClassSelect').value;
+  const subjectId = document.getElementById('pdfSubjectSelect').value;
+  const res       = document.getElementById('postExtractResult');
+  const btn       = document.getElementById('postImportBtn');
+
+  if (!classId || !subjectId) {
+    showToast('Step 1-এ ক্লাস ও বিষয় বেছে নিন', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Import চলছে...';
+  res.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">⏳ Processing...</div>';
+
+  try {
+    const data = await apiFetch('/api/db-import', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId, force: false })
+    });
+
+    const bd = data.breakdown || {};
+    const bdRows = Object.entries(bd).map(([t, n]) =>
+      `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-glass);">
+         <span style="color:var(--text-muted);font-size:12px;">${t}</span>
+         <span style="font-weight:600;font-size:12px;">${n}</span>
+       </div>`
+    ).join('');
+
+    res.innerHTML = `
+      <div style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:600;color:#16a34a;margin-bottom:10px;">✅ Import সফল — এখন Chapter Sync করুন</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:80px;">
+            <div style="font-size:20px;font-weight:700;color:var(--accent-1);">${data.total_chunks}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Chunks</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:80px;">
+            <div style="font-size:20px;font-weight:700;color:#7c3aed;">${data.mcq_count}</div>
+            <div style="font-size:11px;color:var(--text-muted);">MCQ Bank</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:80px;">
+            <div style="font-size:20px;font-weight:700;color:#d97706;">${data.cq_count}</div>
+            <div style="font-size:11px;color:var(--text-muted);">CQ Model</div>
+          </div>
+        </div>
+        ${bdRows ? `<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">Chunk Breakdown</div>${bdRows}` : ''}
+      </div>`;
+    showToast(data.message, 'success');
+    // Enable sync button
+    document.getElementById('postSyncBtn').disabled = false;
+  } catch(e) {
+    res.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🗂️ DB Import করুন';
+  }
+}
+
+async function runPostExtractSync() {
+  const classId   = document.getElementById('pdfClassSelect').value;
+  const subjectId = document.getElementById('pdfSubjectSelect').value;
+  const res       = document.getElementById('postExtractResult');
+  const btn       = document.getElementById('postSyncBtn');
+
+  if (!classId || !subjectId) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Sync চলছে...';
+
+  try {
+    const data = await apiFetch('/api/sync-chapters', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId })
+    });
+
+    const syncDiv = document.createElement('div');
+    syncDiv.style.cssText = 'margin-top:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:12px;';
+    syncDiv.innerHTML = `<div style="font-weight:600;color:#7c3aed;">🔄 Chapter Sync সম্পন্ন</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">${data.message || `${data.synced_chapters || 0}টা chapter sync হয়েছে`}</div>`;
+    res.appendChild(syncDiv);
+    showToast('Chapter Sync সম্পন্ন! ✅', 'success');
+
+    // Mark Step 5 as fully done
+    document.getElementById('stepPostExtract').classList.add('completed');
+  } catch(e) {
+    showToast('Chapter Sync ব্যর্থ: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔄 Chapter Sync';
+  }
+}
+
+async function runDbImport() {
+  const classId   = document.getElementById('dbImportClass').value;
+  const subjectId = document.getElementById('dbImportSubject').value;
+  const force     = document.getElementById('dbImportForce').checked;
+  const res       = document.getElementById('dbImportResult');
+  const btn       = document.getElementById('dbImportBtn');
+
+  if (!classId || !subjectId) { showToast('ক্লাস ও বিষয় বেছে নিন', 'error'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Import চলছে...';
+  res.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;">
+      <div style="width:16px;height:16px;border:2px solid var(--accent-1);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      Background এ শুরু হচ্ছে... (বড় ফাইলে ২-৩ মিনিট লাগতে পারে)
+    </div>`;
+
+  try {
+    // ── Step 1: Import start করো (task_id পাও) ──
+    const startData = await apiFetch('/api/db-import', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId, force })
+    });
+
+    if (!startData.task_id) {
+      throw new Error(startData.error || 'Task শুরু হয়নি');
+    }
+
+    const taskId = startData.task_id;
+
+    // ── Step 2: Poll করো যতক্ষণ না শেষ হয় ──
+    const data = await new Promise((resolve, reject) => {
+      let dots = 0;
+      const timer = setInterval(async () => {
+        try {
+          dots = (dots + 1) % 4;
+          const dotStr = '.'.repeat(dots + 1);
+          const status = await apiFetch(`/api/db-import-status/${taskId}`);
+          res.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px;">
+              <div style="width:16px;height:16px;border:2px solid var(--accent-1);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+              ${status.message || 'Processing'}${dotStr}
+            </div>`;
+
+          if (status.status === 'completed') {
+            clearInterval(timer);
+            resolve(status);
+          } else if (status.status === 'error') {
+            clearInterval(timer);
+            reject(new Error(status.message || 'Import ব্যর্থ'));
+          }
+        } catch (e) {
+          clearInterval(timer);
+          reject(e);
+        }
+      }, 2000);
+    });
+
+    // ── Step 3: Success UI দেখাও ──
+    const bd = data.breakdown || {};
+    const bdRows = Object.entries(bd).map(([t, n]) =>
+      `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-glass);">
+         <span style="color:var(--text-muted);font-size:12px;">${t}</span>
+         <span style="font-weight:600;font-size:12px;">${n}</span>
+       </div>`
+    ).join('');
+
+    res.innerHTML = `
+      <div style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:10px;padding:14px;">
+        <div style="font-weight:600;color:#16a34a;margin-bottom:10px;">✅ Import সফল</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:90px;">
+            <div style="font-size:22px;font-weight:700;color:var(--accent-1);">${data.total_chunks}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Chunks</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:90px;">
+            <div style="font-size:22px;font-weight:700;color:#7c3aed;">${data.mcq_count}</div>
+            <div style="font-size:11px;color:var(--text-muted);">MCQ Bank</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:90px;">
+            <div style="font-size:22px;font-weight:700;color:#d97706;">${data.cq_count}</div>
+            <div style="font-size:11px;color:var(--text-muted);">CQ Model</div>
+          </div>
+        </div>
+        ${bdRows ? `<div style="font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);">Chunk Breakdown</div>${bdRows}` : ''}
+      </div>`;
+    showToast(data.message, 'success');
+  } catch(e) {
+    res.innerHTML = `<div style="color:#dc2626;font-size:13px;padding:10px;background:rgba(220,38,38,0.06);border-radius:8px;">❌ ${e.message}</div>`;
+    showToast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 DB Import করুন';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHAPTER SYNC
+   ══════════════════════════════════════════════════════════ */
+async function loadSyncSubjects() {
+  const classId = document.getElementById('syncClass').value;
+  const sel = document.getElementById('syncSubject');
+  sel.innerHTML = '<option value="">— লোড হচ্ছে —</option>';
+  if (!classId) return;
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— বিষয় —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) { sel.innerHTML = '<option value="">— error —</option>'; }
+}
+
+async function runSyncChapters() {
+  const classId   = document.getElementById('syncClass').value;
+  const subjectId = document.getElementById('syncSubject').value;
+  const res       = document.getElementById('syncResult');
+  const btn       = document.getElementById('syncBtn');
+
+  if (!classId || !subjectId) { showToast('ক্লাস ও বিষয় বেছে নিন', 'error'); return; }
+
+  btn.disabled = true; btn.innerHTML = '⏳ Sync হচ্ছে...';
+  try {
+    const data = await apiFetch('/api/sync-chapters', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId })
+    });
+    res.innerHTML = `<div style="color:#16a34a;font-size:13px;">${data.message}</div>`;
+    showToast(data.message, 'success');
+  } catch(e) {
+    res.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🔄 Chapter Sync করুন';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   MCQ BANK
+   ══════════════════════════════════════════════════════════ */
+async function loadMcqBankSubjects() {
+  const classId = document.getElementById('mcqBankClass').value;
+  const sel = document.getElementById('mcqBankSubject');
+  sel.innerHTML = '<option value="">— লোড হচ্ছে —</option>';
+  if (!classId) return;
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— বিষয় —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) { sel.innerHTML = '<option value="">— error —</option>'; }
+}
+
+async function loadMcqBankSummary() {
+  const el = document.getElementById('mcqBankSummary');
+  el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">⏳ লোড হচ্ছে...</div>';
+  try {
+    const data = await apiFetch('/api/mcq-bank/stats');
+    if (!data.subjects || data.subjects.length === 0) {
+      el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">MCQ Bank খালি</div>'; return;
+    }
+    const rows = data.subjects.map(s =>
+      `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-glass);font-size:13px;">
+         <span>${s.class_id} / ${s.subject_id}</span>
+         <span style="font-weight:600;color:var(--accent-1);">${s.total} MCQ</span>
+       </div>`
+    ).join('');
+    el.innerHTML = `<div style="margin-bottom:8px;font-weight:600;font-size:13px;">মোট: ${data.grand_total} MCQ</div>${rows}`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  }
+}
+
+async function runMcqBankImport() {
+  const classId   = document.getElementById('mcqBankClass').value;
+  const subjectId = document.getElementById('mcqBankSubject').value;
+  const overwrite = document.getElementById('mcqBankOverwrite').checked;
+  const res       = document.getElementById('mcqBankResult');
+  const btn       = document.getElementById('mcqBankImportBtn');
+
+  if (!classId || !subjectId) { showToast('ক্লাস ও বিষয় বেছে নিন', 'error'); return; }
+
+  btn.disabled = true; btn.innerHTML = '⏳ Import হচ্ছে...';
+  try {
+    const data = await apiFetch('/api/mcq-bank/import', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId, overwrite })
+    });
+    res.innerHTML = `<div style="color:#16a34a;font-size:13px;">${data.message}</div>`;
+    showToast(data.message, 'success');
+  } catch(e) {
+    res.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  } finally {
+    btn.disabled = false; btn.innerHTML = '📥 MCQ Bank Import করুন';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   DB HEALTH TAB — Stats + Cache + CQ Model Browser
+   ══════════════════════════════════════════════════════════ */
+async function loadDbStats() {
+  const el = document.getElementById('dbStatsDisplay');
+  el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">⏳ লোড হচ্ছে...</div>';
+  try {
+    const data = await apiFetch('/api/db-stats');
+    const tables = data.tables || {};
+    const bd     = data.chunk_breakdown || {};
+
+    const tableNames = {
+      pdf_content: 'PDF Content (chunks)', mcq_bank: 'MCQ Bank',
+      cq_model_answers: 'CQ Model Answers', response_cache: 'Response Cache',
+      subject_chapters: 'Subject Chapters', chapter_summaries: 'Chapter Summaries',
+      pdf_embeddings: 'PDF Embeddings', student_progress: 'Student Progress',
+      conversation_history: 'Conversation History', training_feedback: 'Training Feedback',
+      exam_sessions: 'Exam Sessions', student_routine: 'Student Routine',
+    };
+
+    const rows = Object.entries(tables).map(([tbl, cnt]) => {
+      const color = cnt === null ? '#9ca3af' : cnt > 0 ? '#16a34a' : '#d97706';
+      const display = cnt === null ? '— (নেই)' : cnt.toLocaleString();
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-glass);">
+        <span style="font-size:13px;">${tableNames[tbl] || tbl}</span>
+        <span style="font-weight:700;font-size:13px;color:${color};">${display}</span>
+      </div>`;
+    }).join('');
+
+    const bdRows = Object.entries(bd).map(([t, n]) =>
+      `<span style="background:var(--bg-card);border:1px solid var(--border-glass);border-radius:6px;padding:3px 8px;font-size:12px;">${t}: <strong>${n}</strong></span>`
+    ).join(' ');
+
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:13px;color:var(--text-muted);">DB আকার</span>
+        <span style="font-weight:700;font-size:15px;">${data.db_size_mb} MB</span>
+      </div>
+      ${rows}
+      ${bdRows ? `<div style="margin-top:12px;"><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Chunk Types</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${bdRows}</div></div>` : ''}`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  }
+}
+
+async function loadCacheClearSubjects() {
+  const classId = document.getElementById('cacheClearClass').value;
+  const sel = document.getElementById('cacheClearSubject');
+  sel.innerHTML = '<option value="">— সব বিষয় —</option>';
+  if (!classId) return;
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— সব বিষয় —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) {}
+}
+
+async function runCacheClear(scope) {
+  const classId   = document.getElementById('cacheClearClass').value;
+  const subjectId = document.getElementById('cacheClearSubject').value;
+  const res       = document.getElementById('cacheClearResult');
+
+  if (scope === 'all' && !confirm('সম্পূর্ণ response cache মুছে দেবেন? এটা পূর্বাবস্থায় ফেরানো যাবে না।')) return;
+
+  try {
+    const data = await apiFetch('/api/cache/clear', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ scope, class_id: classId, subject_id: subjectId })
+    });
+    res.innerHTML = `<div style="color:#16a34a;font-size:13px;">${data.message}</div>`;
+    showToast(data.message, 'success');
+  } catch(e) {
+    res.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  }
+}
+
+let cqModelOffset = 0;
+const CQ_PAGE_SIZE = 20;
+
+async function loadCqModelSubjects() {
+  const classId = document.getElementById('cqModelClass').value;
+  const sel = document.getElementById('cqModelSubject');
+  sel.innerHTML = '<option value="">— লোড হচ্ছে —</option>';
+  if (!classId) return;
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— বিষয় —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) { sel.innerHTML = '<option value="">— error —</option>'; }
+}
+
+async function loadCqModelAnswers(offset = 0) {
+  cqModelOffset = offset;
+  const classId   = document.getElementById('cqModelClass').value;
+  const subjectId = document.getElementById('cqModelSubject').value;
+  const listEl    = document.getElementById('cqModelList');
+  const pagerEl   = document.getElementById('cqModelPager');
+
+  listEl.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">⏳ লোড হচ্ছে...</div>';
+
+  let url = `/api/cq-model-list?limit=${CQ_PAGE_SIZE}&offset=${offset}`;
+  if (classId) url += `&class_id=${classId}`;
+  if (subjectId) url += `&subject_id=${subjectId}`;
+
+  try {
+    const data = await apiFetch(url);
+    if (!data.items || data.items.length === 0) {
+      listEl.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📖</span><div class="empty-state-text">কোনো CQ Model Answer নেই</div></div>';
+      pagerEl.innerHTML = '';
+      return;
+    }
+
+    const cards = data.items.map(item => `
+      <div style="border:1px solid var(--border-glass);border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;">
+          <div>
+            <span style="font-size:11px;background:var(--bg-card);border:1px solid var(--border-glass);border-radius:4px;padding:2px 6px;">${item.class_id} / ${item.subject_id}</span>
+            ${item.chapter ? `<span style="font-size:11px;color:var(--text-muted);margin-left:6px;">${item.chapter}</span>` : ''}
+          </div>
+          <button onclick="deleteCqModel(${item.id})" style="background:none;border:none;cursor:pointer;font-size:16px;color:#dc2626;padding:0 4px;" title="মুছে দিন">🗑️</button>
+        </div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5;background:rgba(124,58,237,0.04);border-radius:6px;padding:8px;">
+          <strong style="font-size:11px;color:var(--text-muted);">উদ্দীপক:</strong><br>${item.stimulus || '—'}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;">
+          ${['ক','খ','গ','ঘ'].map(q => {
+            const qKey = `question_${q === 'ক' ? 'ka' : q === 'খ' ? 'kha' : q === 'গ' ? 'ga' : 'gha'}`;
+            const aKey = `answer_${q === 'ক' ? 'ka' : q === 'খ' ? 'kha' : q === 'গ' ? 'ga' : 'gha'}`;
+            if (!item[qKey]) return '';
+            return `<div style="background:var(--bg-card);border-radius:6px;padding:6px 8px;">
+              <div style="font-weight:600;color:var(--accent-1);">(${q}) ${(item[qKey]||'').substring(0,60)}${item[qKey] && item[qKey].length>60?'...':''}</div>
+              <div style="color:var(--text-muted);margin-top:3px;">${(item[aKey]||'').substring(0,80)}${item[aKey] && item[aKey].length>80?'...':''}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`
+    ).join('');
+
+    listEl.innerHTML = `<div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">মোট ${data.total}টি | দেখাচ্ছে ${offset+1}–${Math.min(offset+CQ_PAGE_SIZE, data.total)}</div>${cards}`;
+
+    // Pager
+    const totalPages = Math.ceil(data.total / CQ_PAGE_SIZE);
+    const curPage    = Math.floor(offset / CQ_PAGE_SIZE);
+    let pagerHTML    = '';
+    if (curPage > 0)           pagerHTML += `<button class="btn btn-secondary btn-sm" onclick="loadCqModelAnswers(${(curPage-1)*CQ_PAGE_SIZE})">← আগে</button>`;
+    pagerHTML += `<span style="font-size:13px;color:var(--text-muted);">পৃষ্ঠা ${curPage+1}/${totalPages}</span>`;
+    if (curPage < totalPages-1) pagerHTML += `<button class="btn btn-secondary btn-sm" onclick="loadCqModelAnswers(${(curPage+1)*CQ_PAGE_SIZE})">পরে →</button>`;
+    pagerEl.innerHTML = pagerHTML;
+
+  } catch(e) {
+    listEl.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  }
+}
+
+async function deleteCqModel(id) {
+  if (!confirm(`CQ #${id} মুছে দেবেন?`)) return;
+  try {
+    const data = await apiFetch('/api/cq-model-delete', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ id })
+    });
+    showToast(data.message, 'success');
+    loadCqModelAnswers(cqModelOffset);
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   POPULATE CLASS DROPDOWNS FOR NEW SECTIONS
+   ══════════════════════════════════════════════════════════ */
+/* ── Helper: /api/classes থেকে flat subject list বের করো ── */
+function extractSubjectsFromClass(classData) {
+  const subjects = [];
+  const seen = new Set();
+  if (!classData || !classData.groups) return subjects;
+  for (const grp of Object.values(classData.groups)) {
+    for (const [id, subj] of Object.entries(grp.subjects || {})) {
+      if (!seen.has(id)) { seen.add(id); subjects.push({ id, name_bn: subj.bn }); }
+    }
+    for (const [id, subj] of Object.entries(grp['4th_subjects'] || {})) {
+      if (!seen.has(id)) { seen.add(id); subjects.push({ id, name_bn: subj.bn }); }
+    }
+  }
+  return subjects;
+}
+
+async function populateAllNewDropdowns() {
+  const targetIds = ['dbImportClass', 'syncClass', 'mcqBankClass', 'cacheClearClass', 'cqModelClass', 'uaiClass'];
+  try {
+    const data = await apiFetch('/api/classes');
+    // API returns { ssc: {label, icon, groups}, hsc: {...} } — NOT data.classes array
+    const opts = '<option value="">— ক্লাস —</option>' +
+      Object.entries(data).map(([id, cls]) =>
+        `<option value="${id}">${cls.icon || '🎓'} ${cls.label || id}</option>`
+      ).join('');
+    targetIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = opts;
+    });
+    // dbImportClass has different placeholder
+    const dbEl = document.getElementById('dbImportClass');
+    if (dbEl) {
+      dbEl.innerHTML = '<option value="">— ক্লাস বেছে নিন —</option>' +
+        Object.entries(data).map(([id, cls]) =>
+          `<option value="${id}">${cls.icon || '🎓'} ${cls.label || id}</option>`
+        ).join('');
+    }
+  } catch(e) { console.error('populateAllNewDropdowns error:', e); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   INITIALIZATION
+   ══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  initUploadZone('uploadZone', 'pdfFileInput');
+  initUploadZone('jsonUploadZone', 'jsonFileInput');
+
+  // Load initial data
+  loadApiKeyStatus();
+  loadClasses();
+  loadModels();
+  loadJobs();
+  loadDataFiles();
+  loadSplitFiles();
+  populateAllNewDropdowns();
+
+  // Add initial CQ parts (ক, খ, গ, ঘ)
+  for (let i = 0; i < 4; i++) addCqPart();
+
+  // File Manager auto-load when tab is clicked
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.getAttribute('data-tab') === 'tab-filemanager') {
+        loadFmDataFiles();
+        loadFmCqFiles();
+        loadFmUploadFiles();
+      }
+      if (btn.getAttribute('data-tab') === 'tab-dbhealth') {
+        loadDbStats();
+      }
+    });
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   JSON UPLOAD + DB IMPORT একসাথে
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Duplicate MCQ মুছো (cross-board merge) ── */
+async function runDeduplicate() {
+  const classId   = document.getElementById('dbImportClass').value;
+  const subjectId = document.getElementById('dbImportSubject').value;
+  const resultDiv = document.getElementById('dbImportResult');
+  const btn       = document.getElementById('deduplicateBtn');
+
+  if (!classId || !subjectId) {
+    resultDiv.innerHTML = '<div class="alert alert-error">❌ আগে ক্লাস ও বিষয় বেছে নিন</div>';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ চলছে...';
+  resultDiv.innerHTML = '<div class="alert alert-info">🔍 Duplicate MCQ খোঁজা হচ্ছে... (বড় DB তে ২-৩ মিনিট লাগতে পারে)</div>';
+
+  try {
+    const data = await apiFetch('/api/mcq/deduplicate', {
+      method: 'POST',
+      body: JSON.stringify({ class_id: classId, subject_id: subjectId }),
+    });
+    if (data.error) {
+      resultDiv.innerHTML = `<div class="alert alert-error">❌ ${data.error}</div>`;
+    } else {
+      resultDiv.innerHTML = `
+        <div class="alert alert-success" style="background:#10b98122;border:1px solid #10b981;">
+          ✅ <strong>Deduplicate সম্পন্ন!</strong><br>
+          🔍 Scan হয়েছে: ${data.total_scanned} MCQ<br>
+          🔁 Duplicate পাওয়া: ${data.duplicates_found}টা<br>
+          🗂️ Merge হয়েছে: ${data.merged_count}টা<br>
+          <small style="color:var(--text-muted)">এখন Frequency Analysis করতে পারবেন।</small>
+        </div>`;
+    }
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="alert alert-error">❌ Error: ${e.message}</div>`;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '🔍 Duplicate মুছুন';
+}
+
+// ক্লাস change হলে subject load করো
+async function loadUaiSubjects() {
+  const classId = document.getElementById('uaiClass').value;
+  const sel = document.getElementById('uaiSubject');
+  sel.innerHTML = '<option value="">— লোড হচ্ছে —</option>';
+  if (!classId) { sel.innerHTML = '<option value="">— বিষয় বেছে নিন —</option>'; return; }
+  try {
+    const data = await apiFetch('/api/classes');
+    const subjects = extractSubjectsFromClass(data[classId]);
+    sel.innerHTML = '<option value="">— বিষয় বেছে নিন —</option>' +
+      subjects.map(s => `<option value="${s.id}">${s.name_bn || s.id}</option>`).join('');
+  } catch(e) { sel.innerHTML = '<option value="">— error —</option>'; }
+}
+
+// ফাইল select হলে নাম দেখাও
+function uaiFileSelected(input) {
+  const f = input.files[0];
+  if (f) document.getElementById('uaiFileName').textContent = '✅ ' + f.name;
+}
+
+// Drag & drop
+function uaiHandleDrop(event) {
+  event.preventDefault();
+  document.getElementById('uaiDropZone').style.background = '';
+  const f = event.dataTransfer.files[0];
+  if (!f || !f.name.endsWith('.json')) {
+    alert('শুধু .json ফাইল দিন');
+    return;
+  }
+  // FileInput এ assign করো
+  const dt = new DataTransfer();
+  dt.items.add(f);
+  document.getElementById('uaiFileInput').files = dt.files;
+  document.getElementById('uaiFileName').textContent = '✅ ' + f.name;
+}
+
+// Main upload + import function
+async function runUploadAndImport() {
+  const classId    = document.getElementById('uaiClass').value;
+  const subjectId  = document.getElementById('uaiSubject').value;
+  const sourceType = document.getElementById('uaiSourceType').value;
+  const force      = document.getElementById('uaiForce').checked;
+  const fileInput  = document.getElementById('uaiFileInput');
+  const resultDiv  = document.getElementById('uaiResult');
+  const btn        = document.getElementById('uaiBtn');
+
+  if (!classId)   { resultDiv.innerHTML = '<div class="alert alert-error">❌ ক্লাস বেছে নিন</div>'; return; }
+  if (!subjectId) { resultDiv.innerHTML = '<div class="alert alert-error">❌ বিষয় বেছে নিন</div>'; return; }
+  if (!fileInput.files.length) { resultDiv.innerHTML = '<div class="alert alert-error">❌ JSON ফাইল দিন</div>'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ আপলোড হচ্ছে...';
+  resultDiv.innerHTML = '';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('class_id', classId);
+    formData.append('subject_id', subjectId);
+    formData.append('source_type', sourceType);
+    formData.append('force', force ? 'true' : 'false');
+
+    const res = await fetch('/admin/api/upload-and-import', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      resultDiv.innerHTML = `<div class="alert alert-error">❌ ${data.error || 'সমস্যা হয়েছে'}</div>`;
+      btn.disabled = false; btn.innerHTML = '⬆️ আপলোড করুন এবং DB তে দিন';
+      return;
+    }
+
+    // সফল আপলোড → DB import poll করো
+    const taskId = data.task_id;
+    resultDiv.innerHTML = `
+      <div class="alert alert-info">
+        ✅ ফাইল save হয়েছে (${data.file_entries} entries)<br>
+        📂 Path: <code style="font-size:11px">${data.saved_path}</code><br>
+        ⏳ DB import চলছে background এ...
+        <div id="uaiProgressBar" style="margin-top:8px;height:6px;background:#ffffff22;border-radius:4px;">
+          <div id="uaiProgressFill" style="height:100%;width:0%;background:#6c63ff;border-radius:4px;transition:width 0.4s;"></div>
+        </div>
+        <div id="uaiProgressText" style="margin-top:4px;font-size:12px;color:var(--text-muted);"></div>
+      </div>`;
+
+    // Poll করো
+    btn.innerHTML = '⏳ Import চলছে...';
+    await uaiPollStatus(taskId);
+
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="alert alert-error">❌ Network error: ${e.message}</div>`;
+    btn.disabled = false; btn.innerHTML = '⬆️ আপলোড করুন এবং DB তে দিন';
+  }
+}
+
+async function uaiPollStatus(taskId) {
+  const btn         = document.getElementById('uaiBtn');
+  const resultDiv   = document.getElementById('uaiResult');
+
+  for (let i = 0; i < 300; i++) {   // max 5 মিনিট poll
+    await new Promise(r => setTimeout(r, 2000));
+    try {
+      const st = await apiFetch(`/api/db-import-status/${taskId}`);
+      const pct = st.progress || 0;
+
+      const bar  = document.getElementById('uaiProgressFill');
+      const text = document.getElementById('uaiProgressText');
+      if (bar)  bar.style.width  = pct + '%';
+      if (text) text.textContent = st.message || '';
+
+      if (st.status === 'done') {
+        resultDiv.innerHTML = `
+          <div class="alert alert-success" style="background:#10b98122;border:1px solid #10b981;">
+            ✅ <strong>Import সম্পন্ন!</strong><br>
+            📦 ${st.chunks_inserted || 0} chunk&nbsp;&nbsp;
+            🔵 ${st.mcq_inserted || 0} MCQ&nbsp;&nbsp;
+            📖 ${st.cq_inserted || 0} CQ<br>
+            <small style="color:var(--text-muted)">এখন Chapter Sync করুন যদি দরকার হয়।</small>
+          </div>`;
+        btn.disabled = false; btn.innerHTML = '⬆️ আপলোড করুন এবং DB তে দিন';
+        return;
+      }
+      if (st.status === 'error') {
+        resultDiv.innerHTML = `<div class="alert alert-error">❌ ${st.message}</div>`;
+        btn.disabled = false; btn.innerHTML = '⬆️ আপলোড করুন এবং DB তে দিন';
+        return;
+      }
+    } catch(e) { /* network blip — চালিয়ে যাও */ }
+  }
+  resultDiv.innerHTML = `<div class="alert alert-error">⏱️ Timeout — DB import status চেক করুন DB স্বাস্থ্য ট্যাবে।</div>`;
+  btn.disabled = false; btn.innerHTML = '⬆️ আপলোড করুন এবং DB তে দিন';
+}
+</script>
+</body>
+</html>
